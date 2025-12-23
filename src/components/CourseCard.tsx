@@ -21,7 +21,7 @@ export function CourseCard({ course }: { course: Course }) {
 								variant="secondary"
 								className="bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200"
 							>
-								{course.credits} Credits
+								{Math.floor(parseInt(course.credits))} Credits
 							</Badge>
 							<span className="text-xs text-slate-400 uppercase tracking-wider font-bold ml-1">
 								{course.level}

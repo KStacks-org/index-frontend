@@ -153,9 +153,13 @@ export function SearchForm({
 										<SelectValue placeholder="Any level" />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="all">Any level</SelectItem>
-										<SelectItem value="Ug">Undergraduate</SelectItem>
-										<SelectItem value="Gr">Graduate</SelectItem>
+										<SelectItem value="all">Any level (الكل)</SelectItem>
+										<SelectItem value="دبلوم">Diploma (دبلوم)</SelectItem>
+										<SelectItem value="بكالوريوس">
+											Bachelor's (بكالوريوس)
+										</SelectItem>
+										<SelectItem value="ماجستير">Master's (ماجستير)</SelectItem>
+										<SelectItem value="دكتوراه">PhD (دكتوراه)</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
