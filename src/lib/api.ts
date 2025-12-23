@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const BASE_URL =
-	"https://fcit-betterkaucoursesscraper-l6iix2-4dfa57-148-113-171-52.traefik.me";
+const BASE_URL = "https://api-kauindex.tariqjandaly.com/";
 
 export interface Schedule {
 	id: number;
