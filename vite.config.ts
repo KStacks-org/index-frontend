@@ -18,6 +18,9 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 	],
+	server: {
+		allowedHosts: ["kauindex.tariqjandaly.com"],
+	},
 });
 
 export default config;
