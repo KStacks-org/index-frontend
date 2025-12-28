@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { searchCourses, SearchParams } from "../lib/api";
 import { KauHeader } from "@/components/KauHeader";
 import { SearchForm } from "@/components/SearchForm";
 import { CourseCard } from "@/components/CourseCard";
-import { Loader2, FilterX } from "lucide-react";
+import { Loader2, FilterX, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CourseSearchSchema {
@@ -16,6 +16,7 @@ interface CourseSearchSchema {
 	endTime?: string;
 	section?: string;
 	termCode?: string;
+	page?: number;
 }
 
 export const Route = createFileRoute("/search")({
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/search")({
 			endTime: (search.endTime as string) || "",
 			section: (search.section as string) || "",
 			termCode: (search.termCode as string) || "202602",
+			page: Number(search.page) || 1, // Default to page 1
 		};
 	},
 	component: SearchPage,
@@ -36,11 +38,20 @@ export const Route = createFileRoute("/search")({
 
 function SearchPage() {
 	const searchParams = Route.useSearch();
+	const navigate = useNavigate({ from: Route.fullPath });
 
 	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ["courses", searchParams],
 		queryFn: () => searchCourses(searchParams as SearchParams),
 	});
+
+	// Helper to handle page changes
+	const handlePageChange = (newPage: number) => {
+		navigate({
+			search: (prev) => ({ ...prev, page: newPage }),
+		});
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
 
 	return (
 		<div className="min-h-screen bg-background flex flex-col font-sans text-foreground">
@@ -49,7 +60,7 @@ function SearchPage() {
 			<main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 md:py-8">
 				<div className="flex flex-col lg:flex-row gap-8">
 					{/* SIDEBAR */}
-					<aside className="w-full lg:w-72 flex-shrink-0">
+					<aside className="w-full lg:w-72 shrink-0">
 						<div className="sticky top-24 bg-card p-4 rounded-lg border border-border">
 							<SearchForm
 								initialValues={searchParams}
@@ -67,7 +78,7 @@ function SearchPage() {
 								{data ? (
 									<>
 										Found{" "}
-										<span className="text-primary">{data.meta.total}</span>{" "}
+										<span className="text-orange-500">{data.meta.total}</span>{" "}
 										courses
 									</>
 								) : (
@@ -79,7 +90,7 @@ function SearchPage() {
 						{/* Loading State */}
 						{isLoading && (
 							<div className="w-full text-center py-32 rounded-lg border-2 border-dashed border-border">
-								<Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
+								<Loader2 className="animate-spin h-10 w-10 text-orange-500 mx-auto" />
 								<p className="mt-4 text-muted-foreground">
 									Fetching courses...
 								</p>
@@ -109,15 +120,44 @@ function SearchPage() {
 										</p>
 										<Button
 											variant="outline"
-											onClick={() => (window.location.href = "/search")}
+											onClick={() => navigate({ search: {} })}
 										>
 											Clear all filters
 										</Button>
 									</div>
 								) : (
-									data.data.map((course) => (
-										<CourseCard key={course.id} course={course} />
-									))
+									<>
+										{data.data.map((course) => (
+											<CourseCard key={course.id} course={course} />
+										))}
+
+										{/* PAGINATION CONTROLS */}
+										<div className="flex items-center justify-between pt-8 border-t border-border mt-8">
+											<div className="text-sm text-muted-foreground">
+												Page {data.meta.page} of {data.meta.totalPages}
+											</div>
+											<div className="flex gap-2">
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={() => handlePageChange(data.meta.page - 1)}
+													disabled={data.meta.page <= 1}
+												>
+													<ChevronLeft className="h-4 w-4 mr-1" />
+													Previous
+												</Button>
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={() => handlePageChange(data.meta.page + 1)}
+													disabled={data.meta.page >= data.meta.totalPages}
+												>
+													Next
+													<ChevronRight className="h-4 w-4 ml-1" />
+												</Button>
+											</div>
+										</div>
+									</>
 								)}
 							</div>
 						)}

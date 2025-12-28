@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { KauHeader } from "@/components/KauHeader";
 import { SearchForm } from "@/components/SearchForm";
-import { Search } from "lucide-react";
 
 export const Route = createFileRoute("/")({
 	component: KauIndexHome,

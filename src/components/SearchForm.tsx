@@ -73,6 +73,7 @@ export function SearchForm({
 			startTime: startTimeFilter || undefined,
 			endTime: endTimeFilter || undefined,
 			section: sectionFilter || undefined,
+			page: 1,
 		};
 
 		navigate({
@@ -150,7 +151,8 @@ export function SearchForm({
 			</div>
 
 			{/* Time Range */}
-			<div className="grid grid-cols-2 gap-2">
+			{/* NEEDS FIXING */}
+			{/*<div className="grid grid-cols-2 gap-2">
 				<div className="space-y-1.5">
 					<Label className="text-xs font-medium text-muted-foreground">
 						Start
@@ -173,7 +175,7 @@ export function SearchForm({
 						onChange={(e) => setEndTimeFilter(e.target.value)}
 					/>
 				</div>
-			</div>
+			</div>*/}
 
 			{/* Section */}
 			<div className="space-y-1.5">

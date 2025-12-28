@@ -1,6 +1,5 @@
 import { Schedule } from "@/lib/api";
 import { Clock, MapPin, User } from "lucide-react";
-import { Badge } from "./ui/badge";
 
 export function ScheduleRow({
 	schedule,
@@ -61,9 +60,10 @@ export function ScheduleRow({
 
 			{/* RIGHT: Badges */}
 			<div className="flex items-center justify-between md:justify-end gap-2 mt-1 md:mt-0">
-				<Badge variant="outline" className="text-xs font-normal">
+				{/* MIGHT ADD LATER */}
+				{/*<Badge variant="outline" className="text-xs font-normal">
 					{schedule.type}
-				</Badge>
+				</Badge>*/}
 				{section && (
 					<span className="text-sm font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
 						{section}
