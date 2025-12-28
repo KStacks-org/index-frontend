@@ -19,7 +19,7 @@ const config = defineConfig({
 		viteReact(),
 	],
 	server: {
-		allowedHosts: ["kauindex.tariqjandaly.com"],
+		allowedHosts: true,
 	},
 });
 
