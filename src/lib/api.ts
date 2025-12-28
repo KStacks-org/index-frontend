@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://api-kauindex.tariqjandaly.com/";
+const BASE_URL = "https://api.kauindex.com/";
 
 export interface Schedule {
 	id: number;
