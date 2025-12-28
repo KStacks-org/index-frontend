@@ -1,52 +1,63 @@
 import axios from "axios";
 
-const BASE_URL = "https://api.kauindex.com/";
+const BASE_URL = "https://api.kauindex.com";
 
 export interface Schedule {
-	id: number;
 	type: string;
-	startTime: string | null;
-	endTime: string | null;
 	days: string;
-	location: string;
+	time: string;
+	room: string;
 	instructor: string;
-	dateRange: string;
-	courseId: number;
 }
 
 export interface Course {
 	id: number;
-	originalTitle: string;
-	courseName: string | null;
-	crn: string | null;
-	subject: string | null;
-	code: string | null;
-	section: string | null;
-	level: string;
-	credits: string;
+	crn: number;
+	section: string;
+	subject: string;
+	courseCode: string; // The course number (e.g. "202")
+	title: string; // The full course name
+	primaryInstructor: string;
+	credits: number;
+	branch: string;
 	schedules: Schedule[];
+
+	// Optional fields if your UI relies on them,
+	// but these are NOT in the current backend 'mappedData':
+	// level?: string;
+	// originalTitle?: string;
 }
 
 export interface SearchParams {
+	termCode?: string;
+	page?: number;
+	limit?: number;
 	q?: string;
 	days?: string;
-	level?: string;
 	instructor?: string;
 	startTime?: string;
 	endTime?: string;
+	level?: string;
+	crn?: string;
 	section?: string;
 }
 
 export interface SearchResponse {
 	status: string;
-	count: number;
-	filters: Record<string, any>;
+	meta: {
+		termName: string;
+		page: number;
+		limit: number;
+		total: number;
+		totalPages: number;
+	};
 	data: Course[];
 }
 
 export const searchCourses = async (
 	params: SearchParams,
 ): Promise<SearchResponse> => {
+	// Clean up params: remove null, empty strings, or 'all' defaults
 	const cleanParams = Object.fromEntries(
 		Object.entries(params).filter(
 			([_, v]) => v != null && v !== "" && v !== "all",

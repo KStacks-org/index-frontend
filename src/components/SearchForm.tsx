@@ -16,25 +16,35 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { SearchParams } from "../lib/api"; // Adjust import path
+import { SearchParams } from "../lib/api";
 
 interface SearchFormProps {
 	initialValues?: Partial<SearchParams>;
 	isLoading?: boolean;
-	compact?: boolean; // To style it differently on home vs search page
+	layout?: "hero" | "sidebar";
 }
 
 export function SearchForm({
 	initialValues,
 	isLoading,
-	compact,
+	layout = "hero",
 }: SearchFormProps) {
 	const navigate = useNavigate();
+
 	const [filtersOpen, setFiltersOpen] = useState(
-		!!(initialValues?.days || initialValues?.level || initialValues?.section),
+		layout === "sidebar" ||
+			!!(
+				initialValues?.days ||
+				initialValues?.level ||
+				initialValues?.section ||
+				initialValues?.instructor ||
+				initialValues?.startTime ||
+				initialValues?.endTime
+			),
 	);
 
 	// State
+	const [termCode, setTermCode] = useState(initialValues?.termCode || "202602");
 	const [query, setQuery] = useState(initialValues?.q || "");
 	const [dayFilter, setDayFilter] = useState(initialValues?.days || "");
 	const [levelFilter, setLevelFilter] = useState(initialValues?.level || "");
@@ -54,8 +64,8 @@ export function SearchForm({
 	const handleSearch = (e?: FormEvent) => {
 		e?.preventDefault();
 
-		// Construct search object, removing empty keys to keep URL clean
 		const search: Record<string, any> = {
+			termCode: termCode,
 			q: query || undefined,
 			days: dayFilter || undefined,
 			level: levelFilter || undefined,
@@ -65,48 +75,190 @@ export function SearchForm({
 			section: sectionFilter || undefined,
 		};
 
-		// Navigate to the search route with params
 		navigate({
 			to: "/search",
 			search: search,
 		});
 	};
 
+	// --- FILTER FIELDS JSX ---
+	const filterFieldsContent = (
+		<>
+			{/* Term Code */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">
+					Term
+				</Label>
+				<Select value={termCode} onValueChange={setTermCode}>
+					<SelectTrigger className="h-9">
+						<SelectValue placeholder="Select Term" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="202602">2026 Term 2</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
+			{/* Day Select */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">Day</Label>
+				<Select value={dayFilter} onValueChange={setDayFilter}>
+					<SelectTrigger className="h-9">
+						<SelectValue placeholder="Any day" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Any day</SelectItem>
+						<SelectItem value="U">Sunday (U)</SelectItem>
+						<SelectItem value="M">Monday (M)</SelectItem>
+						<SelectItem value="T">Tuesday (T)</SelectItem>
+						<SelectItem value="W">Wednesday (W)</SelectItem>
+						<SelectItem value="R">Thursday (R)</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
+			{/* Level Select */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">
+					Level
+				</Label>
+				<Select value={levelFilter} onValueChange={setLevelFilter}>
+					<SelectTrigger className="h-9">
+						<SelectValue placeholder="Any level" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Any level</SelectItem>
+						<SelectItem value="دبلوم">Diploma</SelectItem>
+						<SelectItem value="بكالوريوس">Bachelor's</SelectItem>
+						<SelectItem value="ماجستير">Master's</SelectItem>
+						<SelectItem value="دكتوراه">PhD</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
+			{/* Instructor */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">
+					Instructor
+				</Label>
+				<Input
+					className="h-9"
+					placeholder="Search name..."
+					value={instructorFilter}
+					onChange={(e) => setInstructorFilter(e.target.value)}
+				/>
+			</div>
+
+			{/* Time Range */}
+			<div className="grid grid-cols-2 gap-2">
+				<div className="space-y-1.5">
+					<Label className="text-xs font-medium text-muted-foreground">
+						Start
+					</Label>
+					<Input
+						type="time"
+						className="h-9"
+						value={startTimeFilter}
+						onChange={(e) => setStartTimeFilter(e.target.value)}
+					/>
+				</div>
+				<div className="space-y-1.5">
+					<Label className="text-xs font-medium text-muted-foreground">
+						End
+					</Label>
+					<Input
+						type="time"
+						className="h-9"
+						value={endTimeFilter}
+						onChange={(e) => setEndTimeFilter(e.target.value)}
+					/>
+				</div>
+			</div>
+
+			{/* Section */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">
+					Section
+				</Label>
+				<Input
+					className="h-9"
+					placeholder="e.g., AB"
+					value={sectionFilter}
+					onChange={(e) => setSectionFilter(e.target.value)}
+				/>
+			</div>
+		</>
+	);
+
+	// --- LAYOUT: SIDEBAR MODE ---
+	if (layout === "sidebar") {
+		return (
+			<form onSubmit={handleSearch} className="flex flex-col gap-6 w-full">
+				{/* Search Input */}
+				<div className="space-y-2">
+					<Label className="text-sm font-semibold">Search</Label>
+					<div className="relative">
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+						<Input
+							placeholder="Course, code..."
+							className="pl-9 h-10"
+							value={query}
+							onChange={(e) => setQuery(e.target.value)}
+						/>
+					</div>
+				</div>
+
+				{/* Filters Stack */}
+				<div className="space-y-4">
+					<div className="flex items-center justify-between">
+						<Label className="text-sm font-semibold">Filters</Label>
+					</div>
+					<div className="flex flex-col gap-4">{filterFieldsContent}</div>
+				</div>
+
+				<Button type="submit" className="w-full font-medium">
+					{isLoading ? (
+						<Loader2 className="animate-spin h-4 w-4" />
+					) : (
+						"Apply Filters"
+					)}
+				</Button>
+			</form>
+		);
+	}
+
+	// --- LAYOUT: HERO MODE (Default) ---
 	return (
-		<div className={`w-full ${compact ? "" : "max-w-2xl mx-auto"}`}>
+		<div className="w-full max-w-2xl mx-auto">
 			<form
 				onSubmit={handleSearch}
 				className="flex gap-2 mb-4 relative shadow-sm rounded-lg"
 			>
 				<div className="relative flex-1">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
 					<Input
 						placeholder="Search courses, subjects, instructors..."
-						className="pl-10 h-12 text-lg bg-white border-slate-200 focus-visible:ring-amber-500"
+						className="pl-10 h-12 text-lg"
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
 					/>
 				</div>
-				<Button
-					type="submit"
-					size="lg"
-					className="h-12 bg-slate-900 hover:bg-slate-800 text-white px-8"
-				>
+				<Button type="submit" size="lg" className="h-12 px-8 font-semibold">
 					{isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : "Search"}
 				</Button>
 			</form>
 
-			<div className="bg-white border rounded-lg p-1 shadow-sm">
+			<div className="bg-card border border-border rounded-lg p-1 shadow-sm">
 				<Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
 					<div className="flex items-center justify-between px-3 py-2">
 						<CollapsibleTrigger asChild>
 							<Button
 								variant="ghost"
 								size="sm"
-								className="flex items-center gap-2 text-slate-600"
+								className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
 							>
 								<Filter className="h-4 w-4" />
-								Filters
+								Advanced Filters
 								{filtersOpen ? (
 									<ChevronUp className="h-3 w-3" />
 								) : (
@@ -115,106 +267,15 @@ export function SearchForm({
 							</Button>
 						</CollapsibleTrigger>
 						{!filtersOpen && (
-							<span className="text-xs text-slate-400 hidden sm:block">
-								Refine by Day, Time...
+							<span className="text-xs text-muted-foreground hidden sm:block">
+								Refine by Term, Day, Time...
 							</span>
 						)}
 					</div>
 
-					<CollapsibleContent className="px-3 pb-4 pt-1 space-y-4 border-t mt-1">
+					<CollapsibleContent className="px-3 pb-4 pt-1 border-t border-border mt-1">
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-							{/* Day Select */}
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500">
-									Day
-								</Label>
-								<Select value={dayFilter} onValueChange={setDayFilter}>
-									<SelectTrigger className="h-9">
-										<SelectValue placeholder="Any day" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="all">Any day</SelectItem>
-										<SelectItem value="U">Sunday (U)</SelectItem>
-										<SelectItem value="M">Monday (M)</SelectItem>
-										<SelectItem value="T">Tuesday (T)</SelectItem>
-										<SelectItem value="W">Wednesday (W)</SelectItem>
-										<SelectItem value="R">Thursday (R)</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-
-							{/* Level Select */}
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500">
-									Level
-								</Label>
-								<Select value={levelFilter} onValueChange={setLevelFilter}>
-									<SelectTrigger className="h-9">
-										<SelectValue placeholder="Any level" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="all">Any level (الكل)</SelectItem>
-										<SelectItem value="دبلوم">Diploma (دبلوم)</SelectItem>
-										<SelectItem value="بكالوريوس">
-											Bachelor's (بكالوريوس)
-										</SelectItem>
-										<SelectItem value="ماجستير">Master's (ماجستير)</SelectItem>
-										<SelectItem value="دكتوراه">PhD (دكتوراه)</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-
-							{/* Instructor Input */}
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500">
-									Instructor
-								</Label>
-								<Input
-									className="h-9"
-									placeholder="Search instructor..."
-									value={instructorFilter}
-									onChange={(e) => setInstructorFilter(e.target.value)}
-								/>
-							</div>
-
-							{/* Start Time */}
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500">
-									Start Time
-								</Label>
-								<Input
-									type="time"
-									className="h-9"
-									value={startTimeFilter}
-									onChange={(e) => setStartTimeFilter(e.target.value)}
-								/>
-							</div>
-
-							{/* End Time */}
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500">
-									End Time
-								</Label>
-								<Input
-									type="time"
-									className="h-9"
-									value={endTimeFilter}
-									onChange={(e) => setEndTimeFilter(e.target.value)}
-								/>
-							</div>
-
-							{/* Section */}
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500">
-									Section
-								</Label>
-								<Input
-									className="h-9"
-									placeholder="e.g., AB"
-									value={sectionFilter}
-									onChange={(e) => setSectionFilter(e.target.value)}
-								/>
-							</div>
+							{filterFieldsContent}
 						</div>
 					</CollapsibleContent>
 				</Collapsible>

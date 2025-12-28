@@ -4,11 +4,9 @@ import { searchCourses, SearchParams } from "../lib/api";
 import { KauHeader } from "@/components/KauHeader";
 import { SearchForm } from "@/components/SearchForm";
 import { CourseCard } from "@/components/CourseCard";
-import { Loader2 } from "lucide-react";
+import { Loader2, FilterX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// 1. Define Valid Search Params
-// This ensures strict typing for the URL parameters
 interface CourseSearchSchema {
 	q?: string;
 	days?: string;
@@ -17,10 +15,10 @@ interface CourseSearchSchema {
 	startTime?: string;
 	endTime?: string;
 	section?: string;
+	termCode?: string;
 }
 
 export const Route = createFileRoute("/search")({
-	// Parse URL search params
 	validateSearch: (search: Record<string, unknown>): CourseSearchSchema => {
 		return {
 			q: (search.q as string) || "",
@@ -30,82 +28,101 @@ export const Route = createFileRoute("/search")({
 			startTime: (search.startTime as string) || "",
 			endTime: (search.endTime as string) || "",
 			section: (search.section as string) || "",
+			termCode: (search.termCode as string) || "202602",
 		};
 	},
 	component: SearchPage,
 });
 
 function SearchPage() {
-	// 2. Get params from URL
 	const searchParams = Route.useSearch();
 
-	// 3. Fetch Data based on URL params
 	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ["courses", searchParams],
 		queryFn: () => searchCourses(searchParams as SearchParams),
 	});
 
 	return (
-		<div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
+		<div className="min-h-screen bg-background flex flex-col font-sans text-foreground">
 			<KauHeader />
 
-			<main className="flex-1 flex flex-col items-center px-4 py-8 max-w-5xl mx-auto w-full">
-				{/* Compact Form populated with current URL params */}
-				<div className="w-full mb-8">
-					<SearchForm
-						initialValues={searchParams}
-						isLoading={isLoading}
-						compact
-					/>
-				</div>
+			<main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 md:py-8">
+				<div className="flex flex-col lg:flex-row gap-8">
+					{/* SIDEBAR */}
+					<aside className="w-full lg:w-72 flex-shrink-0">
+						<div className="sticky top-24 bg-card p-4 rounded-lg border border-border">
+							<SearchForm
+								initialValues={searchParams}
+								isLoading={isLoading}
+								layout="sidebar"
+							/>
+						</div>
+					</aside>
 
-				{/* Loading State */}
-				{isLoading && (
-					<div className="w-full text-center py-20">
-						<Loader2 className="animate-spin h-10 w-10 text-amber-500 mx-auto" />
-						<p className="mt-4 text-slate-500">Fetching courses...</p>
-					</div>
-				)}
-
-				{/* Error State */}
-				{isError && (
-					<div className="w-full text-center py-20 text-red-500 bg-red-50 rounded-lg border border-red-100">
-						<p className="font-medium">Connection Error</p>
-						<p className="text-sm opacity-70 mt-1">
-							{(error as Error).message}
-						</p>
-					</div>
-				)}
-
-				{/* Results */}
-				{data && (
-					<div className="w-full space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-						<div className="flex justify-between items-baseline mb-2 px-1">
-							<h2 className="text-xl font-semibold text-slate-800">
-								Found {data.count} results
+					{/* MAIN CONTENT */}
+					<div className="flex-1 min-w-0">
+						{/* Status Bar */}
+						<div className="mb-6 flex items-center justify-between">
+							<h2 className="text-2xl font-bold tracking-tight">
+								{data ? (
+									<>
+										Found{" "}
+										<span className="text-primary">{data.meta.total}</span>{" "}
+										courses
+									</>
+								) : (
+									"Searching..."
+								)}
 							</h2>
 						</div>
 
-						{data.data.length === 0 ? (
-							<div className="text-center py-16 border-2 border-dashed border-slate-200 rounded-lg bg-white">
-								<p className="text-slate-500 text-lg">
-									No courses found matching your criteria.
+						{/* Loading State */}
+						{isLoading && (
+							<div className="w-full text-center py-32 rounded-lg border-2 border-dashed border-border">
+								<Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
+								<p className="mt-4 text-muted-foreground">
+									Fetching courses...
 								</p>
-								{/* Reset button logic handled by navigating to base search or just /search */}
-								<Button
-									variant="link"
-									onClick={() => (window.location.href = "/search")}
-								>
-									Clear filters
-								</Button>
 							</div>
-						) : (
-							data.data.map((course) => (
-								<CourseCard key={course.id} course={course} />
-							))
+						)}
+
+						{/* Error State */}
+						{isError && (
+							<div className="w-full text-center py-20 text-destructive bg-destructive/10 rounded-lg border border-destructive/20">
+								<p className="font-medium">Connection Error</p>
+								<p className="text-sm opacity-70 mt-1">
+									{(error as Error).message}
+								</p>
+							</div>
+						)}
+
+						{/* Results List */}
+						{data && (
+							<div className="space-y-4 animate-in slide-in-from-bottom-4 duration-500">
+								{data.data.length === 0 ? (
+									<div className="text-center py-20 border-2 border-dashed border-border rounded-lg bg-card">
+										<div className="bg-muted p-4 rounded-full inline-block mb-4">
+											<FilterX className="h-8 w-8 text-muted-foreground" />
+										</div>
+										<p className="text-muted-foreground text-lg mb-4">
+											No courses found matching your criteria.
+										</p>
+										<Button
+											variant="outline"
+											onClick={() => (window.location.href = "/search")}
+										>
+											Clear all filters
+										</Button>
+									</div>
+								) : (
+									data.data.map((course) => (
+										<CourseCard key={course.id} course={course} />
+									))
+								)}
+							</div>
 						)}
 					</div>
-				)}
+				</div>
 			</main>
 		</div>
 	);
