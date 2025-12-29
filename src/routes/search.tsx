@@ -30,7 +30,75 @@ export const Route = createFileRoute("/search")({
 			endTime: (search.endTime as string) || "",
 			section: (search.section as string) || "",
 			termCode: (search.termCode as string) || "202602",
-			page: Number(search.page) || 1, // Default to page 1
+			page: Number(search.page) || 1,
+		};
+	},
+
+	loaderDeps: ({ search }) => search,
+
+	loader: async ({ deps }) => {
+		const data = await searchCourses(deps as SearchParams);
+		return { ...data, searchQuery: deps.q };
+	},
+
+	head: ({ loaderData }) => {
+		const total = loaderData?.meta?.total ?? 0;
+		const query = loaderData?.searchQuery;
+
+		const baseUrl = "https://kauindex.com/search";
+
+		const canonicalUrl = query
+			? `${baseUrl}?q=${encodeURIComponent(query)}`
+			: baseUrl;
+
+		return {
+			links: [{ rel: "canonical", href: canonicalUrl }],
+			meta: [
+				{
+					title: query
+						? `${query} Courses - KAU Schedule`
+						: `Search KAU Courses - Browse ${total} Classes`,
+				},
+				{
+					name: "description",
+					content: query
+						? `Browse ${total} available courses for ${query}. Find instructors, times, and sections at KAU.`
+						: `Search the complete KAU course catalog. Filter by instructor, day, time, and level.`,
+				},
+				// Open Graph for social sharing
+				{
+					property: "og:title",
+					content: query ? `${query} Courses` : "KAU Course Search",
+				},
+				{ property: "og:description", content: `Found ${total} courses.` },
+			],
+			// Structured Data
+			scripts: [
+				{
+					type: "application/ld+json",
+					children: JSON.stringify({
+						"@context": "https://schema.org",
+						"@type": "SearchResultsPage",
+						mainEntity: {
+							"@type": "ItemList",
+							itemListElement: loaderData?.data.map((course, index) => ({
+								"@type": "ListItem",
+								position: index + 1,
+								item: {
+									"@type": "Course",
+									name: course.title,
+									courseCode: course.subject + course.courseCode,
+									provider: {
+										"@type": "CollegeOrUniversity",
+										name: "King Abdulaziz University",
+										url: "https://www.kau.edu.sa",
+									},
+								},
+							})),
+						},
+					}),
+				},
+			],
 		};
 	},
 	component: SearchPage,
@@ -40,12 +108,16 @@ function SearchPage() {
 	const searchParams = Route.useSearch();
 	const navigate = useNavigate({ from: Route.fullPath });
 
+	const loaderData = Route.useLoaderData();
+
 	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ["courses", searchParams],
 		queryFn: () => searchCourses(searchParams as SearchParams),
+		// loaderData contains { data, meta, searchQuery }, which is a valid superset
+		// of what searchCourses returns, so this works for hydration
+		initialData: loaderData,
 	});
 
-	// Helper to handle page changes
 	const handlePageChange = (newPage: number) => {
 		navigate({
 			search: (prev) => ({ ...prev, page: newPage }),

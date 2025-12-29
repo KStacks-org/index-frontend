@@ -21,11 +21,6 @@ export interface Course {
 	credits: number;
 	branch: string;
 	schedules: Schedule[];
-
-	// Optional fields if your UI relies on them,
-	// but these are NOT in the current backend 'mappedData':
-	// level?: string;
-	// originalTitle?: string;
 }
 
 export interface SearchParams {
