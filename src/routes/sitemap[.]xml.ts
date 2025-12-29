@@ -7,12 +7,11 @@ export const Route = createFileRoute("/sitemap.xml")({
 				const baseUrl = "https://kauindex.com";
 
 				const popularSearches = [
-					"computer science",
-					"mathematics",
-					"physics",
-					"biology",
-					"chemistry",
-					"marketing",
+					"CPCS 203",
+					"CPIT 222",
+					"CPIT 220",
+					"ISLS 201",
+					"ARAB 101",
 				];
 
 				const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -24,7 +23,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   </url>
 
   <url>
-    <loc>${baseUrl}/search</loc>
+    <loc>${baseUrl}/search?termCode=202602</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
@@ -33,7 +32,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 		.map(
 			(term) => `
   <url>
-    <loc>${baseUrl}/search?q=${encodeURIComponent(term)}</loc>
+    <loc>${baseUrl}/search?termCode=202602&q=${encodeURIComponent(term)}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`,
