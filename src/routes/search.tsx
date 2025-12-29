@@ -88,6 +88,7 @@ export const Route = createFileRoute("/search")({
 									"@type": "Course",
 									name: course.title,
 									courseCode: course.subject + course.courseCode,
+									description: `Official course information for ${course.title} (${course.subject}${course.courseCode}) at King Abdulaziz University.`,
 									provider: {
 										"@type": "CollegeOrUniversity",
 										name: "King Abdulaziz University",
