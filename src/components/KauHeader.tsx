@@ -10,7 +10,7 @@ export function KauHeader() {
 				onClick={() => navigate({ to: "/" })}
 			>
 				<div className="font-bold text-2xl tracking-tight text-foreground">
-					Kau<span className="text-orange-400">Index</span>
+					Kau<span className="text-green-400">Index</span>
 				</div>
 			</div>
 			<div className="text-sm text-muted-foreground hidden sm:block">

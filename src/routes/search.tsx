@@ -78,7 +78,7 @@ function SearchPage() {
 								{data ? (
 									<>
 										Found{" "}
-										<span className="text-orange-500">{data.meta.total}</span>{" "}
+										<span className="text-green-400">{data.meta.total}</span>{" "}
 										courses
 									</>
 								) : (
@@ -90,7 +90,7 @@ function SearchPage() {
 						{/* Loading State */}
 						{isLoading && (
 							<div className="w-full text-center py-32 rounded-lg border-2 border-dashed border-border">
-								<Loader2 className="animate-spin h-10 w-10 text-orange-500 mx-auto" />
+								<Loader2 className="animate-spin h-10 w-10 text-green-400 mx-auto" />
 								<p className="mt-4 text-muted-foreground">
 									Fetching courses...
 								</p>
