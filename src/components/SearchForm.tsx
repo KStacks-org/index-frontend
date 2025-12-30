@@ -1,4 +1,4 @@
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, Loader2, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -115,24 +115,6 @@ export function SearchForm({
 				</Select>
 			</div>
 
-			{/* Gender Select */}
-			<div className="space-y-1.5">
-				<Label className="text-xs font-medium text-muted-foreground">
-					Gender
-				</Label>
-				<Select value={genderFilter} onValueChange={setGenderFilter}>
-					<SelectTrigger className="h-9">
-						<SelectValue placeholder="Any" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">Any</SelectItem>
-						<SelectItem value="male">Male</SelectItem>
-						<SelectItem value="female">Female</SelectItem>
-					</SelectContent>
-				</Select>
-			</div>
-
-			{/* Branch Select */}
 			<div className="space-y-1.5">
 				<Label className="text-xs font-medium text-muted-foreground">
 					Branch
@@ -148,6 +130,23 @@ export function SearchForm({
 								{branch}
 							</SelectItem>
 						))}
+					</SelectContent>
+				</Select>
+			</div>
+
+			{/* Gender Select */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">
+					Gender
+				</Label>
+				<Select value={genderFilter} onValueChange={setGenderFilter}>
+					<SelectTrigger className="h-9">
+						<SelectValue placeholder="Any" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Any</SelectItem>
+						<SelectItem value="male">Male</SelectItem>
+						<SelectItem value="female">Female</SelectItem>
 					</SelectContent>
 				</Select>
 			</div>
@@ -185,6 +184,8 @@ export function SearchForm({
 						<SelectItem value="T">Tuesday (T)</SelectItem>
 						<SelectItem value="W">Wednesday (W)</SelectItem>
 						<SelectItem value="R">Thursday (R)</SelectItem>
+						<SelectItem value="F">Friday (F)</SelectItem>
+						<SelectItem value="S">Saturday (S)</SelectItem>
 					</SelectContent>
 				</Select>
 			</div>

@@ -17,7 +17,7 @@ export function ScheduleRow({
 			<div className="flex flex-wrap items-center gap-3">
 				{/* Days Grid */}
 				<div className="flex gap-0.5">
-					{["U", "M", "T", "W", "R"].map((d) => (
+					{["U", "M", "T", "W", "R", "F", "S"].map((d) => (
 						<div
 							key={d}
 							className={`
