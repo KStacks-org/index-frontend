@@ -3,10 +3,6 @@ import {
 	Scripts,
 	createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import appCss from "../styles.css?url";
 
@@ -59,10 +55,29 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang="en">
 			<head>
 				<HeadContent />
+				<script
+					async
+					src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1756288586646493"
+					crossOrigin="anonymous"
+				></script>
 			</head>
 			<body>
 				{children}
 				<Scripts />
+				<script
+					async
+					src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1756288586646493"
+					crossOrigin="anonymous"
+				></script>
+				<ins
+					className="adsbygoogle"
+					style={{ display: "block" }}
+					data-ad-client="ca-pub-1756288586646493"
+					data-ad-slot="8105192397"
+					data-ad-format="auto"
+					data-full-width-responsive="true"
+				></ins>
+				<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 			</body>
 		</html>
 	);
