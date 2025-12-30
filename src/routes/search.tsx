@@ -6,6 +6,7 @@ import { SearchForm } from "@/components/SearchForm";
 import { CourseCard } from "@/components/CourseCard";
 import { Loader2, FilterX, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AdSenseUnit } from "@/components/AdSenseUnit";
 
 interface CourseSearchSchema {
 	q?: string;
@@ -234,6 +235,9 @@ function SearchPage() {
 								)}
 							</div>
 						)}
+					</div>
+					<div className="mt-6">
+						<AdSenseUnit slot="8105192397" />
 					</div>
 				</div>
 			</main>
