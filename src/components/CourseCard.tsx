@@ -22,6 +22,10 @@ export function CourseCard({ course }: { course: Course }) {
 							<span className="text-xs text-muted-foreground uppercase tracking-wider font-bold ml-1">
 								{course.branch}
 							</span>
+
+							<Badge variant="secondary" className="ml-auto">
+								{course.crn || "ERROR GETTING THE CRN"}
+							</Badge>
 						</div>
 						<CardTitle className="text-xl leading-tight font-bold">
 							{course.title}
