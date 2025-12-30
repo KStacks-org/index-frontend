@@ -105,7 +105,7 @@ export function SearchForm({
 				<Label className="text-xs font-medium text-muted-foreground">
 					Term
 				</Label>
-				<Select value={termCode} onValueChange={setTermCode}>
+				<Select disabled value={termCode} onValueChange={setTermCode}>
 					<SelectTrigger className="h-9">
 						<SelectValue placeholder="Select Term" />
 					</SelectTrigger>
@@ -288,7 +288,7 @@ export function SearchForm({
 			{" "}
 			<form
 				onSubmit={handleSearch}
-				className="flex gap-2 mb-4 relative shadow-sm rounded-lg"
+				className="flex gap-2 mb-4 relative rounded-lg"
 			>
 				<div className="relative flex-1">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
@@ -299,14 +299,18 @@ export function SearchForm({
 						onChange={(e) => setQuery(e.target.value)}
 					/>
 				</div>
-				<Button type="submit" size="lg" className="h-12 px-8 font-semibold">
+				<Button
+					type="submit"
+					size="lg"
+					className="h-12 px-8 font-semibold cursor-pointer"
+				>
 					{isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : "Search"}
 				</Button>
 			</form>
 			<div className="bg-card border border-border rounded-lg p-1 shadow-sm">
 				<Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-					<div className="flex items-center justify-between px-3 py-2">
-						<CollapsibleTrigger asChild>
+					<CollapsibleTrigger asChild>
+						<div className="flex items-center justify-between px-3 py-2">
 							<Button
 								variant="ghost"
 								size="sm"
@@ -315,18 +319,18 @@ export function SearchForm({
 								<Filter className="h-4 w-4" />
 								Advanced Filters
 								{filtersOpen ? (
-									<ChevronUp className="h-3 w-3" />
+									<ChevronUp className="ter" />
 								) : (
 									<ChevronDown className="h-3 w-3" />
 								)}
 							</Button>
-						</CollapsibleTrigger>
-						{!filtersOpen && (
-							<span className="text-xs text-muted-foreground hidden sm:block">
-								Refine by Term, Day, Time...
-							</span>
-						)}
-					</div>
+							{!filtersOpen && (
+								<span className="text-xs text-muted-foreground hidden sm:block">
+									Refine by Gender, Day, Time...
+								</span>
+							)}
+						</div>
+					</CollapsibleTrigger>
 
 					<CollapsibleContent className="px-3 pb-4 pt-1 border-t border-border mt-1">
 						<div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">

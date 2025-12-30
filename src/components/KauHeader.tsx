@@ -14,7 +14,7 @@ export function KauHeader() {
 				</div>
 			</div>
 			<div className="text-sm text-muted-foreground hidden sm:block">
-				King Abdulaziz University
+				{/*King Abdulaziz University*/}
 			</div>
 		</header>
 	);

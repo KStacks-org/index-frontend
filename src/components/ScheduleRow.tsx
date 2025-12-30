@@ -3,7 +3,6 @@ import { Clock, MapPin, User } from "lucide-react";
 
 export function ScheduleRow({
 	schedule,
-	section,
 }: {
 	schedule: Schedule;
 	section: string | null;
@@ -12,11 +11,11 @@ export function ScheduleRow({
 		schedule.days && schedule.days.includes(dayChar);
 
 	return (
-		<div className="flex flex-col gap-3 p-3 rounded-md bg-card border border-border hover:border-primary/50 hover:bg-muted/50 transition-all group text-center">
+		<div className="flex flex-col gap-3 p-3 rounded-md bg-card border border-border transition-all group text-center">
 			{/* ROW 1 */}
 			<div className="flex w-full pb-2 border-b border-border/50">
 				{/* 1. Days */}
-				<div className="flex gap-0.5">
+				<div className="w-full flex gap-0.5 justify-around sm:justify-start">
 					{["U", "M", "T", "W", "R", "F", "S"].map((d) => (
 						<div
 							key={d}
@@ -33,18 +32,23 @@ export function ScheduleRow({
 						</div>
 					))}
 				</div>
+				{/* 2. Time LARGE */}
+				<div className="hidden sm:flex items-center gap-1.5 text-foreground font-medium text-sm whitespace-nowrap">
+					<Clock className="h-3.5 w-3.5 text-primary" />
+					<span>{schedule.time || "TBA"}</span>
+				</div>
 			</div>
 
 			{/* ROW 2 */}
-			<div className="grid grid-cols-2 md:grid-cols-[0.8fr_1fr_2fr_auto] items-center gap-3 w-full">
-				{/* 1. Time */}
-				<div className="flex items-center justify-center md:justify-start gap-1.5 text-foreground font-medium text-sm whitespace-nowrap">
+			<div className="flex flex-col md:flex-row justify-around items-start gap-3 md:items-center md:w-full">
+				{/* 1. Time SMALL */}
+				<div className="sm:hidden flex items-center gap-2 text-foreground min-w-0 px-2">
 					<Clock className="h-3.5 w-3.5 text-primary" />
 					<span>{schedule.time || "TBA"}</span>
 				</div>
 
 				{/* 2. Instructor */}
-				<div className="flex items-center justify-center md:justify-start gap-2 text-muted-foreground min-w-0 px-2">
+				<div className="flex items-center gap-2 text-muted-foreground min-w-0 px-2">
 					<User className="h-3.5 w-3.5 shrink-0" />
 					<span className="text-sm truncate" title={schedule.instructor}>
 						{schedule.instructor || "Staff"}
@@ -52,7 +56,7 @@ export function ScheduleRow({
 				</div>
 
 				{/* 3. Location (Now takes the most space) */}
-				<div className="flex items-center justify-center md:justify-start gap-2 text-muted-foreground min-w-0 px-2">
+				<div className="flex items-center gap-2 text-muted-foreground min-w-0 px-2">
 					<MapPin className="h-3.5 w-3.5 shrink-0" />
 					{/* 'truncate' ensures it respects the new width limit if text is huge */}
 					<span
@@ -61,15 +65,6 @@ export function ScheduleRow({
 					>
 						{schedule.room || "TBA"}
 					</span>
-				</div>
-
-				{/* 4. Section Badge (Shrinks to fit content) */}
-				<div className="flex items-center justify-center md:justify-end">
-					{section && (
-						<span className="text-sm font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20 whitespace-nowrap">
-							{section}
-						</span>
-					)}
 				</div>
 			</div>
 		</div>
