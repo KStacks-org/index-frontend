@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, Loader2, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,11 +39,13 @@ export function SearchForm({
 				initialValues?.section ||
 				initialValues?.instructor ||
 				initialValues?.startTime ||
-				initialValues?.endTime
+				initialValues?.endTime ||
+				initialValues?.gender ||
+				initialValues?.branch
 			),
 	);
 
-	// State
+	// --- STATE ---
 	const [termCode, setTermCode] = useState(initialValues?.termCode || "202602");
 	const [query, setQuery] = useState(initialValues?.q || "");
 	const [dayFilter, setDayFilter] = useState(initialValues?.days || "");
@@ -61,18 +63,31 @@ export function SearchForm({
 		initialValues?.section || "",
 	);
 
+	// New State for Gender & Branch
+	const [genderFilter, setGenderFilter] = useState(initialValues?.gender || "");
+	const [branchFilter, setBranchFilter] = useState(initialValues?.branch || "");
+
+	const availableBranches = [
+		"المركز الرئيسي",
+		"فرع المرجان (ابحر)",
+		"فرع رابغ",
+	];
+
 	const handleSearch = (e?: FormEvent) => {
 		e?.preventDefault();
 
 		const search: Record<string, any> = {
 			termCode: termCode,
 			q: query || undefined,
-			days: dayFilter || undefined,
-			level: levelFilter || undefined,
+			days: dayFilter === "all" ? undefined : dayFilter || undefined,
+			level: levelFilter === "all" ? undefined : levelFilter || undefined,
 			instructor: instructorFilter || undefined,
 			startTime: startTimeFilter || undefined,
 			endTime: endTimeFilter || undefined,
 			section: sectionFilter || undefined,
+			// Add new fields to search query
+			gender: genderFilter === "all" ? undefined : genderFilter || undefined,
+			branch: branchFilter === "all" ? undefined : branchFilter || undefined,
 			page: 1,
 		};
 
@@ -100,20 +115,39 @@ export function SearchForm({
 				</Select>
 			</div>
 
-			{/* Day Select */}
+			{/* Gender Select */}
 			<div className="space-y-1.5">
-				<Label className="text-xs font-medium text-muted-foreground">Day</Label>
-				<Select value={dayFilter} onValueChange={setDayFilter}>
+				<Label className="text-xs font-medium text-muted-foreground">
+					Gender
+				</Label>
+				<Select value={genderFilter} onValueChange={setGenderFilter}>
 					<SelectTrigger className="h-9">
-						<SelectValue placeholder="Any day" />
+						<SelectValue placeholder="Any" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">Any day</SelectItem>
-						<SelectItem value="U">Sunday (U)</SelectItem>
-						<SelectItem value="M">Monday (M)</SelectItem>
-						<SelectItem value="T">Tuesday (T)</SelectItem>
-						<SelectItem value="W">Wednesday (W)</SelectItem>
-						<SelectItem value="R">Thursday (R)</SelectItem>
+						<SelectItem value="all">Any</SelectItem>
+						<SelectItem value="male">Male</SelectItem>
+						<SelectItem value="female">Female</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
+			{/* Branch Select */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">
+					Branch
+				</Label>
+				<Select value={branchFilter} onValueChange={setBranchFilter}>
+					<SelectTrigger className="h-9">
+						<SelectValue placeholder="Any" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Any</SelectItem>
+						{availableBranches.map((branch) => (
+							<SelectItem key={branch} value={branch}>
+								{branch}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 			</div>
@@ -137,17 +171,22 @@ export function SearchForm({
 				</Select>
 			</div>
 
-			{/* Instructor */}
+			{/* Day Select */}
 			<div className="space-y-1.5">
-				<Label className="text-xs font-medium text-muted-foreground">
-					Instructor
-				</Label>
-				<Input
-					className="h-9"
-					placeholder="Search name..."
-					value={instructorFilter}
-					onChange={(e) => setInstructorFilter(e.target.value)}
-				/>
+				<Label className="text-xs font-medium text-muted-foreground">Day</Label>
+				<Select value={dayFilter} onValueChange={setDayFilter}>
+					<SelectTrigger className="h-9">
+						<SelectValue placeholder="Any day" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Any day</SelectItem>
+						<SelectItem value="U">Sunday (U)</SelectItem>
+						<SelectItem value="M">Monday (M)</SelectItem>
+						<SelectItem value="T">Tuesday (T)</SelectItem>
+						<SelectItem value="W">Wednesday (W)</SelectItem>
+						<SelectItem value="R">Thursday (R)</SelectItem>
+					</SelectContent>
+				</Select>
 			</div>
 
 			{/* Time Range */}
@@ -174,6 +213,19 @@ export function SearchForm({
 						onChange={(e) => setEndTimeFilter(e.target.value)}
 					/>
 				</div>
+			</div>
+
+			{/* Instructor */}
+			<div className="space-y-1.5">
+				<Label className="text-xs font-medium text-muted-foreground">
+					Instructor
+				</Label>
+				<Input
+					className="h-9"
+					placeholder="Search name..."
+					value={instructorFilter}
+					onChange={(e) => setInstructorFilter(e.target.value)}
+				/>
 			</div>
 
 			{/* Section */}
@@ -214,6 +266,7 @@ export function SearchForm({
 					<div className="flex items-center justify-between">
 						<Label className="text-sm font-semibold">Filters</Label>
 					</div>
+					{/* Updated to 2 columns in sidebar for compactness if needed, or keep as col */}
 					<div className="flex flex-col gap-4">{filterFieldsContent}</div>
 				</div>
 
@@ -230,7 +283,8 @@ export function SearchForm({
 
 	// --- LAYOUT: HERO MODE (Default) ---
 	return (
-		<div className="w-full max-w-2xl mx-auto">
+		<div className="w-full max-w-3xl mx-auto">
+			{" "}
 			<form
 				onSubmit={handleSearch}
 				className="flex gap-2 mb-4 relative shadow-sm rounded-lg"
@@ -248,7 +302,6 @@ export function SearchForm({
 					{isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : "Search"}
 				</Button>
 			</form>
-
 			<div className="bg-card border border-border rounded-lg p-1 shadow-sm">
 				<Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
 					<div className="flex items-center justify-between px-3 py-2">
@@ -275,7 +328,7 @@ export function SearchForm({
 					</div>
 
 					<CollapsibleContent className="px-3 pb-4 pt-1 border-t border-border mt-1">
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+						<div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
 							{filterFieldsContent}
 						</div>
 					</CollapsibleContent>

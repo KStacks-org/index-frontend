@@ -35,6 +35,8 @@ export interface SearchParams {
 	level?: string;
 	crn?: string;
 	section?: string;
+	branch?: string;
+	gender?: string;
 }
 
 export interface SearchResponse {
