@@ -34,6 +34,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				content:
 					"Search and filter King Abdulaziz University courses, find instructors, and build your schedule easily with KauIndex.",
 			},
+			{
+				name: "google-adsense-account",
+				content: "ca-pub-1756288586646493",
+			},
 		],
 		links: [
 			{
