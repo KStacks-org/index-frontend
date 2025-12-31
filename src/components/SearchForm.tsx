@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { SearchParams } from "../lib/api";
+import { DayMultiSelect } from "./DayMultiSelect";
 
 interface SearchFormProps {
 	initialValues?: Partial<SearchParams>;
@@ -171,24 +172,7 @@ export function SearchForm({
 			</div>
 
 			{/* Day Select */}
-			<div className="space-y-1.5">
-				<Label className="text-xs font-medium text-muted-foreground">Day</Label>
-				<Select value={dayFilter} onValueChange={setDayFilter}>
-					<SelectTrigger className="h-9">
-						<SelectValue placeholder="Any day" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">Any day</SelectItem>
-						<SelectItem value="U">Sunday (U)</SelectItem>
-						<SelectItem value="M">Monday (M)</SelectItem>
-						<SelectItem value="T">Tuesday (T)</SelectItem>
-						<SelectItem value="W">Wednesday (W)</SelectItem>
-						<SelectItem value="R">Thursday (R)</SelectItem>
-						<SelectItem value="F">Friday (F)</SelectItem>
-						<SelectItem value="S">Saturday (S)</SelectItem>
-					</SelectContent>
-				</Select>
-			</div>
+			<DayMultiSelect value={dayFilter} onChange={setDayFilter} />
 
 			{/* Time Range */}
 			<div className="grid grid-cols-2 gap-2">
