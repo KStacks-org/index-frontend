@@ -34,15 +34,38 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				name: "google-adsense-account",
 				content: "ca-pub-1756288586646493",
 			},
+			// Recommended: Matches your manifest theme color for mobile browsers
+			{
+				name: "theme-color",
+				content: "#ffffff",
+			},
 		],
 		links: [
 			{
 				rel: "stylesheet",
 				href: appCss,
 			},
+			// 1. Modern SVG Favicon (Preferred by modern browsers)
 			{
 				rel: "icon",
-				href: "https://fav.farm/📖",
+				type: "image/svg+xml",
+				href: "/favicon.svg",
+			},
+			// 2. Legacy .ico Favicon (Fallback for older tools)
+			{
+				rel: "icon",
+				sizes: "any",
+				href: "/favicon.ico",
+			},
+			// 3. Apple Touch Icon (iOS Home Screen)
+			{
+				rel: "apple-touch-icon",
+				href: "/apple-touch-icon.png",
+			},
+			// 4. Web Manifest (Android & Google Search configuration)
+			{
+				rel: "manifest",
+				href: "/site.webmanifest",
 			},
 		],
 	}),

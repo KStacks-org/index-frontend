@@ -136,11 +136,25 @@ function SearchPage() {
 					{/* SIDEBAR */}
 					<aside className="w-full lg:w-72 shrink-0">
 						<div className="sticky top-24 bg-card p-4 rounded-lg border border-border">
-							<SearchForm
-								initialValues={searchParams}
-								isLoading={isLoading}
-								layout="sidebar"
-							/>
+							<div className="block lg:hidden">
+								<SearchForm
+									initialValues={searchParams}
+									isLoading={isLoading}
+									overlayFilters={true}
+									dropDown={true}
+									layout="sidebar"
+								/>
+							</div>
+
+							<div className="hidden lg:block">
+								<SearchForm
+									initialValues={searchParams}
+									isLoading={isLoading}
+									overlayFilters={false}
+									dropDown={false}
+									layout="sidebar"
+								/>
+							</div>
 						</div>
 					</aside>
 

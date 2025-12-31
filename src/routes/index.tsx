@@ -25,7 +25,7 @@ function KauIndexHome() {
 						</p>
 					</div>
 
-					<SearchForm layout="hero" />
+					<SearchForm overlayFilters={false} layout="hero" />
 				</div>
 				{/*<AdSenseUnit slot="8105192397" className="mt-12 w-full max-w-3xl" />*/}
 			</main>

@@ -18,33 +18,29 @@ import {
 import { Label } from "@/components/ui/label";
 import { SearchParams } from "../lib/api";
 import { DayMultiSelect } from "./DayMultiSelect";
+import { cn } from "@/lib/utils"; // Import cn utility
 
 interface SearchFormProps {
 	initialValues?: Partial<SearchParams>;
 	isLoading?: boolean;
 	layout?: "hero" | "sidebar";
+	onSearch?: (filters: any) => void;
+	overlayFilters: boolean;
+	dropDown?: boolean;
 }
 
 export function SearchForm({
 	initialValues,
 	isLoading,
 	layout = "hero",
+	overlayFilters,
+	dropDown = false,
+	onSearch,
 }: SearchFormProps) {
 	const navigate = useNavigate();
 
-	const [filtersOpen, setFiltersOpen] = useState(
-		layout === "sidebar" ||
-			!!(
-				initialValues?.days ||
-				initialValues?.level ||
-				initialValues?.section ||
-				initialValues?.instructor ||
-				initialValues?.startTime ||
-				initialValues?.endTime ||
-				initialValues?.gender ||
-				initialValues?.branch
-			),
-	);
+	// Default open state: Open if sidebar OR if values exist
+	const [filtersOpen, setFiltersOpen] = useState(false);
 
 	// --- STATE ---
 	const [termCode, setTermCode] = useState(initialValues?.termCode || "202602");
@@ -63,8 +59,6 @@ export function SearchForm({
 	const [sectionFilter, setSectionFilter] = useState(
 		initialValues?.section || "",
 	);
-
-	// New State for Gender & Branch
 	const [genderFilter, setGenderFilter] = useState(initialValues?.gender || "");
 	const [branchFilter, setBranchFilter] = useState(initialValues?.branch || "");
 
@@ -77,7 +71,7 @@ export function SearchForm({
 	const handleSearch = (e?: FormEvent) => {
 		e?.preventDefault();
 
-		const search: Record<string, any> = {
+		const searchParams: Record<string, any> = {
 			termCode: termCode,
 			q: query || undefined,
 			days: dayFilter === "all" ? undefined : dayFilter || undefined,
@@ -86,19 +80,28 @@ export function SearchForm({
 			startTime: startTimeFilter || undefined,
 			endTime: endTimeFilter || undefined,
 			section: sectionFilter || undefined,
-			// Add new fields to search query
 			gender: genderFilter === "all" ? undefined : genderFilter || undefined,
 			branch: branchFilter === "all" ? undefined : branchFilter || undefined,
 			page: 1,
 		};
 
-		navigate({
-			to: "/search",
-			search: search,
-		});
+		if (layout === "sidebar" && overlayFilters) {
+			setFiltersOpen(false);
+		}
+
+		// IF onSearch is provided, use it (Local State)
+		if (onSearch) {
+			onSearch(searchParams);
+		} else {
+			// ELSE navigate (Router)
+			navigate({
+				to: "/search",
+				search: searchParams,
+			});
+		}
 	};
 
-	// --- FILTER FIELDS JSX ---
+	// --- FILTER FIELDS JSX (Reusable) ---
 	const filterFieldsContent = (
 		<>
 			{/* Term Code */}
@@ -116,6 +119,7 @@ export function SearchForm({
 				</Select>
 			</div>
 
+			{/* Branch */}
 			<div className="space-y-1.5">
 				<Label className="text-xs font-medium text-muted-foreground">
 					Branch
@@ -126,16 +130,16 @@ export function SearchForm({
 					</SelectTrigger>
 					<SelectContent>
 						<SelectItem value="all">Any</SelectItem>
-						{availableBranches.map((branch) => (
-							<SelectItem key={branch} value={branch}>
-								{branch}
+						{availableBranches.map((b) => (
+							<SelectItem key={b} value={b}>
+								{b}
 							</SelectItem>
 						))}
 					</SelectContent>
 				</Select>
 			</div>
 
-			{/* Gender Select */}
+			{/* Gender */}
 			<div className="space-y-1.5">
 				<Label className="text-xs font-medium text-muted-foreground">
 					Gender
@@ -152,7 +156,7 @@ export function SearchForm({
 				</Select>
 			</div>
 
-			{/* Level Select */}
+			{/* Level */}
 			<div className="space-y-1.5">
 				<Label className="text-xs font-medium text-muted-foreground">
 					Level
@@ -231,45 +235,74 @@ export function SearchForm({
 	// --- LAYOUT: SIDEBAR MODE ---
 	if (layout === "sidebar") {
 		return (
-			<form onSubmit={handleSearch} className="flex flex-col gap-6 w-full">
+			<form
+				onSubmit={handleSearch}
+				className="flex flex-col gap-4 w-full relative"
+			>
 				{/* Search Input */}
-				<div className="space-y-2">
-					<Label className="text-sm font-semibold">Search</Label>
-					<div className="relative">
-						<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-						<Input
-							placeholder="Course, code..."
-							className="pl-9 h-10"
-							value={query}
-							onChange={(e) => setQuery(e.target.value)}
-						/>
-					</div>
+				<div className="relative z-20">
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+					<Input
+						placeholder="Course, code..."
+						className="pl-9 h-10 bg-background"
+						value={query}
+						onChange={(e) => setQuery(e.target.value)}
+					/>
 				</div>
 
-				{/* Filters Stack */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<Label className="text-sm font-semibold">Filters</Label>
-					</div>
-					{/* Updated to 2 columns in sidebar for compactness if needed, or keep as col */}
-					<div className="flex flex-col gap-4">{filterFieldsContent}</div>
-				</div>
-
-				<Button type="submit" className="w-full font-medium">
-					{isLoading ? (
-						<Loader2 className="animate-spin h-4 w-4" />
-					) : (
-						"Apply Filters"
+				{/* Filters Collapse */}
+				<Collapsible
+					open={!dropDown ? true : filtersOpen}
+					onOpenChange={setFiltersOpen}
+					className={cn("space-y-2", overlayFilters && "z-30")}
+				>
+					{dropDown && (
+						<CollapsibleTrigger asChild>
+							<Button
+								variant="outline"
+								size="sm"
+								type="button"
+								className="w-full flex justify-between bg-background hover:bg-muted"
+							>
+								<span className="flex items-center gap-2">
+									<Filter className="h-3 w-3" /> Filters
+								</span>
+								{filtersOpen ? (
+									<ChevronUp className="h-3 w-3" />
+								) : (
+									<ChevronDown className="h-3 w-3" />
+								)}
+							</Button>
+						</CollapsibleTrigger>
 					)}
-				</Button>
+
+					<CollapsibleContent
+						className={cn(
+							// Base styles
+							"space-y-4 pt-2 border rounded-md p-3 bg-muted/20",
+							// Conditional Overlay styles
+							overlayFilters &&
+								"absolute top-full left-0 right-0 mt-2 bg-card shadow-xl z-50 animate-in fade-in zoom-in-95 duration-200",
+						)}
+					>
+						{filterFieldsContent}
+
+						<Button type="submit" className="w-full font-medium">
+							{isLoading ? (
+								<Loader2 className="animate-spin h-4 w-4" />
+							) : (
+								"Apply Filters"
+							)}
+						</Button>
+					</CollapsibleContent>
+				</Collapsible>
 			</form>
 		);
 	}
 
-	// --- LAYOUT: HERO MODE (Default) ---
+	// --- LAYOUT: HERO MODE (Unchanged logic for main search page) ---
 	return (
 		<div className="w-full max-w-3xl mx-auto">
-			{" "}
 			<form
 				onSubmit={handleSearch}
 				className="flex gap-2 mb-4 relative rounded-lg"
@@ -277,7 +310,7 @@ export function SearchForm({
 				<div className="relative flex-1">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
 					<Input
-						placeholder="Search courses, subjects, instructors..."
+						placeholder="Search courses..."
 						className="pl-10 h-12 text-lg"
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
@@ -294,28 +327,22 @@ export function SearchForm({
 			<div className="bg-card border border-border rounded-lg p-1 shadow-sm">
 				<Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
 					<CollapsibleTrigger asChild>
-						<div className="flex items-center justify-between px-3 py-2">
+						<div className="flex items-center justify-between px-3 py-2 cursor-pointer">
 							<Button
 								variant="ghost"
 								size="sm"
-								className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+								type="button"
+								className="flex items-center gap-2 text-muted-foreground"
 							>
-								<Filter className="h-4 w-4" />
-								Advanced Filters
+								<Filter className="h-4 w-4" /> Advanced Filters
 								{filtersOpen ? (
-									<ChevronUp className="ter" />
+									<ChevronUp className="h-3 w-3" />
 								) : (
 									<ChevronDown className="h-3 w-3" />
 								)}
 							</Button>
-							{!filtersOpen && (
-								<span className="text-xs text-muted-foreground hidden sm:block">
-									Refine by Gender, Day, Time...
-								</span>
-							)}
 						</div>
 					</CollapsibleTrigger>
-
 					<CollapsibleContent className="px-3 pb-4 pt-1 border-t border-border mt-1">
 						<div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
 							{filterFieldsContent}
