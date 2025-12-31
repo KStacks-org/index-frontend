@@ -236,9 +236,7 @@ function SearchPage() {
 							</div>
 						)}
 					</div>
-					<div className="mt-6">
-						<AdSenseUnit slot="8105192397" />
-					</div>
+					<div className="mt-6">{/*<AdSenseUnit slot="8105192397" />*/}</div>
 				</div>
 			</main>
 		</div>
