@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { KauHeader } from "@/components/KauHeader";
 import { SearchForm } from "@/components/SearchForm";
-import { AdSenseUnit } from "@/components/AdSenseUnit";
 
 export const Route = createFileRoute("/")({
 	component: KauIndexHome,
@@ -27,7 +26,6 @@ function KauIndexHome() {
 
 					<SearchForm overlayFilters={false} layout="hero" />
 				</div>
-				{/*<AdSenseUnit slot="8105192397" className="mt-12 w-full max-w-3xl" />*/}
 			</main>
 		</div>
 	);
