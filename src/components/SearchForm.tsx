@@ -119,7 +119,9 @@ export function SearchForm({
 		setGenderFilter("");
 		setBranchFilter("");
 
-		handleSearch();
+		setTimeout(() => {
+			handleSearch();
+		}, 250);
 	};
 
 	useEffect(() => {
