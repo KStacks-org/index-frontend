@@ -36,7 +36,7 @@ function AboutPage() {
 			x: "https://x.com/iinvct",
 		},
 		{
-			name: "Yassir",
+			name: "Yasir",
 			roles: ["Co-Founder", "Frontend Developer", "UI/UX"],
 			initials: "YA",
 			imagePath: "/team/lock.png",
