@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dialog";
 import { Course, useScheduleStore } from "@/lib/schedule-store";
 import { parseTimeRange } from "@/lib/schedule-utils";
+import { KauFooter } from "@/components/KauFooter";
 
 export const Route = createFileRoute("/planner")({
 	component: SchedulePage,
@@ -499,6 +500,7 @@ function SchedulePage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+			<KauFooter />
 		</div>
 	);
 }

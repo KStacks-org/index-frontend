@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { KauHeader } from "@/components/KauHeader";
 import { SearchForm } from "@/components/SearchForm";
+import { KauFooter } from "@/components/KauFooter";
 
 export const Route = createFileRoute("/")({
 	component: KauIndexHome,
@@ -27,6 +28,7 @@ function KauIndexHome() {
 					<SearchForm overlayFilters={false} layout="hero" />
 				</div>
 			</main>
+			<KauFooter />
 		</div>
 	);
 }

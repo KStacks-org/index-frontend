@@ -6,6 +6,7 @@ import { SearchForm } from "@/components/SearchForm";
 import { CourseCard } from "@/components/CourseCard";
 import { Loader2, FilterX, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { KauFooter } from "@/components/KauFooter";
 
 interface CourseSearchSchema {
 	q?: string;
@@ -251,6 +252,7 @@ function SearchPage() {
 					</div>
 				</div>
 			</main>
+			<KauFooter />
 		</div>
 	);
 }
