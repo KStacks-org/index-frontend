@@ -50,7 +50,7 @@ export function ScheduleCalendar() {
 
 	if (selectedCourses.length === 0) {
 		return (
-			<div className="h-full bg-muted/10 border-2 border-dashed border-muted rounded-xl flex flex-col items-center justify-center text-center text-muted-foreground p-8 min-h-100">
+			<div className="h-full rounded-tl-none bg-muted/10 border-2 border-dashed border-muted rounded-xl flex flex-col items-center justify-center text-center text-muted-foreground p-8 min-h-100">
 				<p className="font-medium text-lg">Your schedule is empty.</p>
 				<p className="text-sm mt-1">
 					Search for courses to build your calendar.
