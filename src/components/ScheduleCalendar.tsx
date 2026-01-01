@@ -2,6 +2,14 @@ import { useMemo } from "react";
 import { useScheduleStore } from "../lib/schedule-store";
 import { DAY_MAP, DAYS_HEADER, parseTimeRange } from "../lib/schedule-utils";
 
+const COLORS = [
+	"bg-blue-100 border-blue-300 text-blue-800",
+	"bg-green-100 border-green-300 text-green-800",
+	"bg-purple-100 border-purple-300 text-purple-800",
+	"bg-orange-100 border-orange-300 text-orange-800",
+	"bg-pink-100 border-pink-300 text-pink-800",
+];
+
 export function ScheduleCalendar() {
 	const { selectedCourses } = useScheduleStore();
 
@@ -127,22 +135,23 @@ export function ScheduleCalendar() {
 										const heightPercent =
 											((time.end - time.start) / totalViewMinutes) * 100;
 
+										const color =
+											COLORS[parseInt(course.courseCode) % COLORS.length];
+
 										return (
 											<div
 												key={`${course.crn}-${schedIdx}-${day}`}
-												className={`absolute left-[2%] w-[96%] rounded-[2px] md:rounded-md px-0.5 md:px-1.5 py-0.5 md:py-1 leading-none border shadow-sm z-10 overflow-hidden group flex flex-col justify-start ${course.color || "bg-primary/10 border-primary/20 text-primary-foreground"}`}
+												className={`absolute left-[2%] w-[96%] rounded-[2px] md:rounded-md px-0.5 md:px-1.5 py-0.5 md:py-1 leading-none border shadow-sm z-10 overflow-hidden group flex flex-col justify-start ${color || "bg-primary/10 border-primary/20 text-primary-foreground"}`}
 												style={{
 													top: `${topPercent}%`,
 													height: `${heightPercent}%`,
-													backgroundColor: course.color
+													backgroundColor: color
 														? undefined
 														: "hsl(var(--primary) / 0.1)",
-													borderColor: course.color
+													borderColor: color
 														? undefined
 														: "hsl(var(--primary) / 0.2)",
-													color: course.color
-														? undefined
-														: "hsl(var(--foreground))",
+													color: color ? undefined : "hsl(var(--foreground))",
 												}}
 												title={`${course.title} \n${sched.time} \n${sched.instructor}`}
 											>

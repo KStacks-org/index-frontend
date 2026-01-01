@@ -2,7 +2,7 @@ import { Course } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Plus, AlertCircle, X, Replace } from "lucide-react";
+import { Plus, AlertCircle, X } from "lucide-react";
 import { ScheduleRow } from "./ScheduleRow";
 import { useScheduleStore } from "@/lib/schedule-store";
 import { cn } from "@/lib/utils";

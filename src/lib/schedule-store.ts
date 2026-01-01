@@ -19,7 +19,6 @@ export interface Course {
 		room: string;
 		instructor: string;
 	}>;
-	color?: string; // UI property for the calendar
 }
 
 interface ScheduleState {
@@ -28,14 +27,6 @@ interface ScheduleState {
 	removeCourse: (courseId: number) => void;
 	isCourseSelected: (courseId: number) => boolean;
 }
-
-const COLORS = [
-	"bg-blue-100 border-blue-300 text-blue-800",
-	"bg-green-100 border-green-300 text-green-800",
-	"bg-purple-100 border-purple-300 text-purple-800",
-	"bg-orange-100 border-orange-300 text-orange-800",
-	"bg-pink-100 border-pink-300 text-pink-800",
-];
 
 export const useScheduleStore = create<ScheduleState>()(
 	persist(
@@ -48,10 +39,9 @@ export const useScheduleStore = create<ScheduleState>()(
 				if (current.find((c) => c.id === course.id)) return;
 
 				// Assign a color cyclically
-				const color = COLORS[current.length % COLORS.length];
 
-				// Save the full course object with the new color
-				set({ selectedCourses: [...current, { ...course, color }] });
+				// Save the full course object
+				set({ selectedCourses: [...current, { ...course }] });
 			},
 
 			removeCourse: (courseId) => {
