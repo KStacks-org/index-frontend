@@ -1,6 +1,13 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Search, Loader2, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import {
+	Search,
+	Loader2,
+	Filter,
+	ChevronDown,
+	ChevronUp,
+	RotateCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,7 +25,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { SearchParams } from "../lib/api";
 import { DayMultiSelect } from "./DayMultiSelect";
-import { cn } from "@/lib/utils"; // Import cn utility
+import { cn } from "@/lib/utils";
 
 interface SearchFormProps {
 	initialValues?: Partial<SearchParams>;
@@ -100,6 +107,31 @@ export function SearchForm({
 			});
 		}
 	};
+
+	const handleReset = () => {
+		setTermCode("202602");
+		setQuery("");
+		setDayFilter("");
+		setLevelFilter("");
+		setInstructorFilter("");
+		setStartTimeFilter("");
+		setEndTimeFilter("");
+		setSectionFilter("");
+		setGenderFilter("");
+		setBranchFilter("");
+
+		handleSearch();
+	};
+
+	useEffect(() => {
+		if (layout == "sidebar") {
+			const delayDebounceFn = setTimeout(() => {
+				handleSearch();
+			}, 1000);
+
+			return () => clearTimeout(delayDebounceFn);
+		}
+	}, [query]);
 
 	// --- FILTER FIELDS JSX (Reusable) ---
 	const filterFieldsContent = (
@@ -240,14 +272,28 @@ export function SearchForm({
 				className="flex flex-col gap-4 w-full relative"
 			>
 				{/* Search Input */}
-				<div className="relative z-20">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-					<Input
-						placeholder="Course, code..."
-						className="pl-9 h-10 bg-background"
-						value={query}
-						onChange={(e) => setQuery(e.target.value)}
-					/>
+				<div className="flex gap-2">
+					{!dropDown && (
+						<Button
+							disabled={isLoading}
+							onClick={handleReset}
+							type="button"
+							variant={"outline"}
+							className="h-10 w-10 p-0 active:scale-[105%]"
+						>
+							<RotateCw size={15} />
+						</Button>
+					)}
+
+					<div className="relative w-full z-20">
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+						<Input
+							placeholder="Course, code..."
+							className="pl-9 h-10 bg-background"
+							value={query}
+							onChange={(e) => setQuery(e.target.value)}
+						/>
+					</div>
 				</div>
 
 				{/* Filters Collapse */}
@@ -257,23 +303,34 @@ export function SearchForm({
 					className={cn("space-y-2", overlayFilters && "z-30")}
 				>
 					{dropDown && (
-						<CollapsibleTrigger asChild>
+						<div className="grid grid-cols-8 gap-1">
+							<CollapsibleTrigger asChild>
+								<Button
+									variant="outline"
+									size="sm"
+									type="button"
+									className="col-span-7 h-9 flex justify-between bg-background hover:bg-muted"
+								>
+									<span className="flex items-center gap-2">
+										<Filter className="h-3 w-3" /> Filters
+									</span>
+									{filtersOpen ? (
+										<ChevronUp className="h-3 w-3" />
+									) : (
+										<ChevronDown className="h-3 w-3" />
+									)}
+								</Button>
+							</CollapsibleTrigger>
 							<Button
-								variant="outline"
-								size="sm"
+								disabled={isLoading}
+								onClick={handleReset}
 								type="button"
-								className="w-full flex justify-between bg-background hover:bg-muted"
+								variant={"outline"}
+								className="h-9 active:scale-[105%]"
 							>
-								<span className="flex items-center gap-2">
-									<Filter className="h-3 w-3" /> Filters
-								</span>
-								{filtersOpen ? (
-									<ChevronUp className="h-3 w-3" />
-								) : (
-									<ChevronDown className="h-3 w-3" />
-								)}
+								<RotateCw size={15} />
 							</Button>
-						</CollapsibleTrigger>
+						</div>
 					)}
 
 					<CollapsibleContent
