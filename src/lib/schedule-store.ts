@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
-// Updated interface to match your API and eliminate TS2739
+// Your existing Course interface
 export interface Course {
 	id: number;
 	crn: number;
@@ -9,9 +9,9 @@ export interface Course {
 	courseCode: string;
 	subject: string;
 	section: string;
-	primaryInstructor: string; // Added
-	credits: number; // Added
-	branch: string; // Added
+	primaryInstructor: string;
+	credits: number;
+	branch: string;
 	schedules: Array<{
 		type: string;
 		days: string;
@@ -21,43 +21,129 @@ export interface Course {
 	}>;
 }
 
+// New Interface for a Tab
+export interface ScheduleTab {
+	id: string;
+	name: string;
+	courses: Course[];
+}
+
 interface ScheduleState {
-	selectedCourses: Course[];
+	tabs: ScheduleTab[];
+	activeTabId: string;
+
+	// Tab Actions
+	addTab: (name: string) => void;
+	removeTab: (tabId: string) => void;
+	renameTab: (tabId: string, newName: string) => void;
+	setActiveTab: (tabId: string) => void;
+
+	// Course Actions (Apply to the ACTIVE tab)
 	addCourse: (course: Course) => void;
 	removeCourse: (courseId: number) => void;
+
+	// Selectors
+	getActiveCourses: () => Course[];
 	isCourseSelected: (courseId: number) => boolean;
 }
 
 export const useScheduleStore = create<ScheduleState>()(
 	persist(
 		(set, get) => ({
-			selectedCourses: [],
+			// Initial State (Default tab)
+			tabs: [{ id: "default", name: "Schedule 1", courses: [] }],
+			activeTabId: "default",
 
+			// --- Tab Management ---
+			addTab: (name) => {
+				const { tabs } = get();
+				// --- LIMIT CHECK: Max 5 tabs ---
+				if (tabs.length >= 5) return;
+
+				const newId = crypto.randomUUID();
+				set((state) => ({
+					tabs: [...state.tabs, { id: newId, name, courses: [] }],
+					activeTabId: newId,
+				}));
+			},
+
+			removeTab: (tabId) => {
+				const { tabs, activeTabId } = get();
+				if (tabs.length <= 1) return; // Prevent deleting the last tab
+
+				const newTabs = tabs.filter((t) => t.id !== tabId);
+				// If closing active tab, switch to the first available
+				const newActiveId = activeTabId === tabId ? newTabs[0].id : activeTabId;
+
+				set({ tabs: newTabs, activeTabId: newActiveId });
+			},
+
+			renameTab: (tabId, newName) => {
+				set((state) => ({
+					tabs: state.tabs.map((t) =>
+						t.id === tabId ? { ...t, name: newName } : t,
+					),
+				}));
+			},
+
+			setActiveTab: (tabId) => set({ activeTabId: tabId }),
+
+			// --- Course Management (Targets Active Tab) ---
 			addCourse: (course) => {
-				const current = get().selectedCourses;
-				// Prevent duplicates
-				if (current.find((c) => c.id === course.id)) return;
+				const { tabs, activeTabId } = get();
 
-				// Assign a color cyclically
+				const updatedTabs = tabs.map((tab) => {
+					if (tab.id !== activeTabId) return tab;
 
-				// Save the full course object
-				set({ selectedCourses: [...current, { ...course }] });
+					// Prevent duplicates in this specific tab
+					if (tab.courses.find((c) => c.id === course.id)) return tab;
+
+					// Add course
+					return { ...tab, courses: [...tab.courses, { ...course }] };
+				});
+
+				set({ tabs: updatedTabs });
 			},
 
 			removeCourse: (courseId) => {
-				set({
-					selectedCourses: get().selectedCourses.filter(
-						(c) => c.id !== courseId,
-					),
+				const { tabs, activeTabId } = get();
+				const updatedTabs = tabs.map((tab) => {
+					if (tab.id !== activeTabId) return tab;
+					return {
+						...tab,
+						courses: tab.courses.filter((c) => c.id !== courseId),
+					};
 				});
+				set({ tabs: updatedTabs });
+			},
+
+			// --- Selectors ---
+			getActiveCourses: () => {
+				const { tabs, activeTabId } = get();
+				return tabs.find((t) => t.id === activeTabId)?.courses || [];
 			},
 
 			isCourseSelected: (courseId) => {
-				return !!get().selectedCourses.find((c) => c.id === courseId);
+				const courses = get().getActiveCourses();
+				return !!courses.find((c) => c.id === courseId);
 			},
 		}),
 		{
 			name: "kau-schedule-storage",
+			storage: createJSONStorage(() => localStorage),
+
+			// --- MIGRATION LOGIC ---
+			version: 1,
+			migrate: (persistedState: any, version) => {
+				if (version === 0) {
+					const oldCourses = persistedState.selectedCourses || [];
+					return {
+						tabs: [{ id: "default", name: "Schedule 1", courses: oldCourses }],
+						activeTabId: "default",
+					};
+				}
+				return persistedState as ScheduleState;
+			},
 		},
 	),
 );

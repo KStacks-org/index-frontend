@@ -11,7 +11,8 @@ const COLORS = [
 ];
 
 export function ScheduleCalendar() {
-	const { selectedCourses } = useScheduleStore();
+	const getActiveCourses = useScheduleStore((state) => state.getActiveCourses);
+	const selectedCourses = getActiveCourses();
 
 	// 1. DYNAMIC RANGE CALCULATION (Zoom to fit content)
 	const { startHour, totalHours } = useMemo(() => {
@@ -59,9 +60,9 @@ export function ScheduleCalendar() {
 	}
 
 	return (
-		<div className="flex flex-col h-full bg-background rounded-xl border shadow-sm overflow-hidden w-full">
+		<div className="flex flex-col h-full bg-background rounded-xl border border-t-0 border-l-0 overflow-hidden w-full">
 			{/* HEADER ROW (Days) */}
-			<div className="flex border-b bg-background h-8 md:h-10 shadow-sm shrink-0 z-20 relative">
+			<div className="flex border-b bg-background h-8 md:h-10 shrink-0 z-20 relative">
 				<div className="w-8 md:w-14 border-r bg-background shrink-0 border-b"></div>
 				<div className="flex-1 grid grid-cols-7 divide-x bg-background w-full">
 					{DAYS_HEADER.map((day) => (
