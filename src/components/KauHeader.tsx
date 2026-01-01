@@ -36,7 +36,7 @@ export function KauHeader() {
 				</Link>
 				<Link
 					to="/about"
-					className="hidden md:flex items-center font-medium text-sm text-muted-foreground hover:text-green-600 dark:hover:text-green-400 transition-colors"
+					className="flex items-center font-medium text-sm text-muted-foreground hover:text-green-600 dark:hover:text-green-400 transition-colors"
 					activeProps={{
 						className: "text-green-600 dark:text-green-400 font-semibold",
 					}}
