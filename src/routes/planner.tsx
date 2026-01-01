@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toPng } from "html-to-image";
-import { searchCourses, SearchParams } from "../lib/api";
+import { Schedule, searchCourses, SearchParams } from "../lib/api";
 import { KauHeader } from "@/components/KauHeader";
 import { ScheduleCalendar } from "@/components/ScheduleCalendar";
 import { CourseCard } from "@/components/CourseCard";
@@ -24,7 +24,7 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from "@/components/ui/sheet";
-import { useScheduleStore } from "@/lib/schedule-store";
+import { Course, useScheduleStore } from "@/lib/schedule-store";
 import { parseTimeRange } from "@/lib/schedule-utils";
 
 export const Route = createFileRoute("/planner")({
@@ -63,21 +63,39 @@ function SchedulePage() {
 		setLocalFilters((prev) => ({ ...prev, page: newPage }));
 	};
 
-	const checkConflict = (courseToCheck: any) => {
-		if (selectedCourses.find((c) => c.id === courseToCheck.id)) return false;
-		return selectedCourses.some((selected) => {
+	const checkConflict = (courseToCheck: Course): Course[] => {
+		// 1. If the exact section is already selected, return empty array (no conflicts to report)
+		if (selectedCourses.some((c) => c.id === courseToCheck.id)) return [];
+
+		// 2. Filter to find ALL courses that conflict
+		const conflicts = selectedCourses.filter((selected) => {
+			// Check A: Is it the same course code? (e.g. Can't add two CPCS 203)
+			if (selected.courseCode === courseToCheck.courseCode) {
+				return true;
+			}
+
+			// Check B: Is there a time conflict?
 			return selected.schedules.some((selSched) => {
-				return courseToCheck.schedules.some((checkSched: any) => {
+				return courseToCheck.schedules.some((checkSched: Schedule) => {
 					const selDays = selSched.days.split("");
 					const checkDays = checkSched.days.split("");
+
+					// If they don't share any days, they don't conflict
 					if (!selDays.some((d) => checkDays.includes(d))) return false;
+
 					const selTime = parseTimeRange(selSched.time);
 					const checkTime = parseTimeRange(checkSched.time);
+
 					if (!selTime || !checkTime) return false;
+
+					// Check if time ranges overlap
 					return selTime.start < checkTime.end && selTime.end > checkTime.start;
 				});
 			});
 		});
+
+		// 3. Return the array of conflicting courses (empty if none)
+		return conflicts;
 	};
 
 	const openSidebar = (mode: "view" | "search") => {
@@ -242,7 +260,10 @@ function SchedulePage() {
 												key={course.id}
 												course={course}
 												compact={true}
-												conflict={checkConflict(course)}
+												conflict={
+													checkConflict(course).length > 0 ? true : false
+												}
+												conflictCourse={checkConflict(course)}
 											/>
 										))}
 									</div>

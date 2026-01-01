@@ -2,7 +2,7 @@ import { Course } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Plus, AlertCircle, X } from "lucide-react";
+import { Plus, AlertCircle, X, Replace } from "lucide-react";
 import { ScheduleRow } from "./ScheduleRow";
 import { useScheduleStore } from "@/lib/schedule-store";
 import { cn } from "@/lib/utils";
@@ -11,12 +11,14 @@ interface CourseCardProps {
 	course: Course;
 	compact?: boolean; // Enables the sidebar layout
 	conflict?: boolean; // grays out the card if true
+	conflictCourse?: Course[];
 }
 
 export function CourseCard({
 	course,
 	compact = false,
 	conflict = false,
+	conflictCourse: conflictCourses,
 }: CourseCardProps) {
 	const { addCourse, removeCourse, isCourseSelected } = useScheduleStore();
 	const selected = isCourseSelected(course.id);
@@ -31,6 +33,15 @@ export function CourseCard({
 		}
 	};
 
+	const handleReplace = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (conflict && conflictCourses != null) {
+			conflictCourses.forEach((c) => removeCourse(c.id));
+			addCourse(course);
+		}
+	};
+
 	// --- COMPACT VIEW (For Sidebar) ---
 	if (compact) {
 		return (
@@ -41,7 +52,7 @@ export function CourseCard({
 						? "border-primary/50 bg-primary/5"
 						: "hover:border-primary/50",
 					conflict && !selected
-						? "opacity-60 bg-muted/30 border-dashed border-destructive/30"
+						? "opacity-50 bg-muted/30 border-dashed border-destructive/30"
 						: "",
 				)}
 			>
@@ -72,6 +83,24 @@ export function CourseCard({
 							<span className="text-[10px] text-muted-foreground font-mono ml-auto">
 								{course.crn}
 							</span>
+
+							{/* Compact Action Button */}
+							<Button
+								size="icon"
+								variant={selected ? "destructive" : "secondary"}
+								className={cn(
+									"h-7 w-7 shrink-0 mt-0.5 cursor-pointer",
+									conflict && !selected && "cursor-not-allowed opacity-50",
+								)}
+								onClick={handleToggle}
+								disabled={conflict && !selected}
+							>
+								{selected ? (
+									<X className="h-3.5 w-3.5" />
+								) : (
+									<Plus className="h-3.5 w-3.5" />
+								)}
+							</Button>
 						</div>
 
 						{/* Title */}
@@ -106,32 +135,24 @@ export function CourseCard({
 								</div>
 							))}
 						</div>
-
 						{/* Conflict Warning */}
-						{conflict && !selected && (
-							<div className="mt-2 text-[10px] text-destructive flex items-center gap-1 font-medium bg-destructive/5 p-1 rounded">
-								<AlertCircle className="h-3 w-3" /> Time Conflict
+						{(conflictCourses?.length ?? 0) > 0 && !selected && (
+							<div className="mt-2 w-full text-[10px] text-destructive flex items-center gap-1 font-medium bg-destructive/5 p-1 rounded">
+								<AlertCircle className="h-3 w-3" /> Conflict with{" "}
+								{conflictCourses?.map((c) => (
+									<div key={c.id}>
+										{c?.subject}-{c?.courseCode}{" "}
+									</div>
+								))}
+								<button
+									onClick={handleReplace}
+									className="ml-auto mr-5 underline cursor-pointer"
+								>
+									Replace
+								</button>
 							</div>
 						)}
 					</div>
-
-					{/* Compact Action Button */}
-					<Button
-						size="icon"
-						variant={selected ? "destructive" : "secondary"}
-						className={cn(
-							"h-7 w-7 shrink-0 mt-0.5",
-							conflict && !selected && "cursor-not-allowed opacity-50",
-						)}
-						onClick={handleToggle}
-						disabled={conflict && !selected}
-					>
-						{selected ? (
-							<X className="h-3.5 w-3.5" />
-						) : (
-							<Plus className="h-3.5 w-3.5" />
-						)}
-					</Button>
 				</div>
 			</div>
 		);
