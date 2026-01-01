@@ -18,9 +18,10 @@ RUN pnpm install --frozen-lockfile
 # 6. Copy the rest of your application code
 COPY . .
 
+RUN pnpm run build
+
 # 7. Expose the port your app runs on
-# (Change 3000 to 5173 if using Vite, or 8080, etc.)
 EXPOSE 3000
 
 # 8. Define the command to run your app
-CMD ["pnpm", "run", "dev"]
+CMD ["npx", "vite", "preview", "--port", "3000", "--host"]
