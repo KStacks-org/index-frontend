@@ -110,7 +110,6 @@ export function SearchForm({
 
 	const handleReset = () => {
 		setTermCode("202602");
-		setQuery("");
 		setDayFilter("");
 		setLevelFilter("");
 		setInstructorFilter("");
