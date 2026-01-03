@@ -6,7 +6,7 @@ import { SearchForm } from "@/components/SearchForm";
 import { CourseCard } from "@/components/CourseCard";
 import { Loader2, FilterX, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AdSenseUnit } from "@/components/AdSenseUnit";
+import DarkVeil from "@/components/DarkVeil";
 
 interface CourseSearchSchema {
 	q?: string;
@@ -82,7 +82,7 @@ export const Route = createFileRoute("/search")({
 						"@type": "SearchResultsPage",
 						mainEntity: {
 							"@type": "ItemList",
-							itemListElement: loaderData?.data.map((course, index) => ({
+							itemListElement: (loaderData?.data ?? []).map((course, index) => ({
 								"@type": "ListItem",
 								position: index + 1,
 								item: {
@@ -128,14 +128,19 @@ function SearchPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-background flex flex-col font-sans text-foreground">
+		<div className="min-h-screen bg-black flex flex-col font-sans text-foreground relative isolate">
+		{/* Background layer */}
+					<div className= "fixed inset-0 z-0 pointer-events-none overflow-hidden transform-gpu">
+						<DarkVeil speed={0.5} hueShift={70} scanlineFrequency={0.5} scanlineIntensity={0.4}/>
+					</div>
+			
 			<KauHeader />
 
-			<main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 md:py-8">
+			<main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 md:py-8  z-10">
 				<div className="flex flex-col lg:flex-row gap-8">
 					{/* SIDEBAR */}
 					<aside className="w-full lg:w-72 shrink-0">
-						<div className="sticky top-24 bg-card p-4 rounded-lg border border-border">
+						<div className="sticky top-24 bg-card p-4 rounded-lg  bg-transparent ">
 							<div className="block lg:hidden">
 								<SearchForm
 									initialValues={searchParams}
@@ -162,11 +167,11 @@ function SearchPage() {
 					<div className="flex-1 min-w-0">
 						{/* Status Bar */}
 						<div className="mb-6 flex items-center justify-between">
-							<h2 className="text-2xl font-bold tracking-tight">
+							<h2 className="text-2xl font-bold tracking-tight text-white/90">
 								{data ? (
 									<>
 										Found{" "}
-										<span className="text-green-400">{data.meta.total}</span>{" "}
+										<span className="text-green-600">{data.meta.total}</span>{" "}
 										courses
 									</>
 								) : (
@@ -199,8 +204,8 @@ function SearchPage() {
 						{data && (
 							<div className="space-y-4 animate-in slide-in-from-bottom-4 duration-500">
 								{data.data.length === 0 ? (
-									<div className="text-center py-20 border-2 border-dashed border-border rounded-lg bg-card">
-										<div className="bg-muted p-4 rounded-full inline-block mb-4">
+									<div className="text-center py-20 border-2 border-dashed border-border/60 rounded-lg bg-transparent">
+										<div className="bg-muted p-4 rounded-full inline-block mb-4 bg-transparent">
 											<FilterX className="h-8 w-8 text-muted-foreground" />
 										</div>
 										<p className="text-muted-foreground text-lg mb-4">
@@ -209,6 +214,8 @@ function SearchPage() {
 										<Button
 											variant="outline"
 											onClick={() => navigate({ search: {} })}
+											className="bg-white/10 border border-white/35 rounded-md text-white/90 hover:bg-white/20 hover:border-white/20 hover:text-white/100 transition-colors"
+											
 										>
 											Clear all filters
 										</Button>
@@ -221,11 +228,12 @@ function SearchPage() {
 
 										{/* PAGINATION CONTROLS */}
 										<div className="flex items-center justify-between pt-8 border-t border-border mt-8">
-											<div className="text-sm text-muted-foreground">
+											<div className="text-sm text-white/90">
 												Page {data.meta.page} of {data.meta.totalPages}
 											</div>
 											<div className="flex gap-2">
 												<Button
+												className=" bg-white/10 backdrop-blur-xl backdrop-saturate-150 border border-white/15 rounded-2xl shadow-lg text-white/90 hover:bg-white/20 hover:border-white/20 hover:text-white/100 transition-colors"
 													variant="outline"
 													size="sm"
 													onClick={() => handlePageChange(data.meta.page - 1)}
@@ -235,6 +243,7 @@ function SearchPage() {
 													Previous
 												</Button>
 												<Button
+												className=" bg-white/10 backdrop-blur-xl backdrop-saturate-150 border border-white/15 rounded-2xl shadow-lg text-white/90 hover:bg-white/20 hover:border-white/20 hover:text-white/100 transition-colors"
 													variant="outline"
 													size="sm"
 													onClick={() => handlePageChange(data.meta.page + 1)}

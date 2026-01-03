@@ -7,6 +7,7 @@ import {
 import appCss from "../styles.css?url";
 
 import type { QueryClient } from "@tanstack/react-query";
+import { BootGate } from "@/components/BootGate";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -87,7 +88,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				{/* ----------------------------- */}
 			</head>
 			<body>
-				{children}
+				<BootGate>{children}</BootGate>
 				<Scripts />
 			</body>
 		</html>

@@ -46,9 +46,9 @@ export function CourseCard({
 				)}
 			>
 				<div className="p-3 flex items-start gap-3">
-					<div className="flex-1 min-w-0">
+					<div className="flex-1 min-w-0 ">
 						{/* Header Row: Code, CRN, Section */}
-						<div className="flex flex-wrap items-center gap-2 mb-1.5">
+						<div className="flex flex-wrap items-center gap-2 mb-1.5 ">
 							<Badge
 								variant="secondary"
 								className="text-[10px] px-1.5 h-5 font-mono bg-muted text-foreground border border-border/50"
@@ -58,7 +58,7 @@ export function CourseCard({
 							</Badge>
 
 							{course.credits && (
-								<Badge className="text-[10px] px-1.5 h-5 font-mono bg-muted text-foreground border border-border/50">
+								<Badge className="text-[10px] px-1.5 h-5 font-mono bg-muted text-foreground border border-border/50 ">
 									{course.credits} Credits
 								</Badge>
 							)}
@@ -141,22 +141,23 @@ export function CourseCard({
 	return (
 		<Card
 			className={cn(
-				"overflow-hidden hover:shadow-md transition-all duration-200",
-				selected && "border-primary/50 ring-1 ring-primary/20 bg-primary/5",
+				"overflow-hidden hover:shadow-md transition-all duration-200 bg-white/13 backdrop-blur-xl backdrop-saturate-100 border border-white/15 rounded-2xl shadow-lg text-white/90",
+				selected && "text-white/90", // selected logic is always running, dropped it off for now vvv
+				//"border-primary/50 ring-1 ring-primary/20 bg-primary/10"
 			)}
 		>
-			<CardHeader className="pb-3 border-b border-border bg-muted/20">
+			<CardHeader className="pb-3 border-b border-border  ">
 				<div className="flex flex-row items-start justify-between gap-4">
 					{/* Main Content Area */}
 					<div className="flex-1 min-w-0">
 						<div className="hidden sm:flex sm:flex-wrap items-center gap-2 mb-2">
 							{/* Subject & Code */}
-							<Badge variant="outline" className="font-mono">
+							<Badge variant="outline" className="font-mono text-white/90 border-white/15 bg-white/5">
 								{course.subject} {course.courseCode}
 							</Badge>
 
 							{/* Credits */}
-							<Badge variant="secondary">{course.credits} Credits</Badge>
+							<Badge className="text-white/90 border-white/15 bg-white/20" variant="secondary">{course.credits} Credits</Badge>
 
 							{/* Branch */}
 							<span className="text-xs text-muted-foreground uppercase tracking-wider font-bold ml-1">
@@ -166,16 +167,16 @@ export function CourseCard({
 							{/* CRN */}
 							<Badge
 								variant="outline"
-								className="min-w-14 ml-auto hidden md:inline-flex"
+								className="min-w-14 ml-auto hidden md:inline-flex font-mono text-white/90 border-white/15 bg-white/10"
 							>
 								{course.crn || "N/A"}
 							</Badge>
 						</div>
 
-						<div className="flex flex-col justify-between items-center gap-2">
-							<div className="w-full flex justify-between sm:mb-0 mb-5">
+						<div className="flex flex-col justify-between items-center gap-2 ">
+							<div className="w-full flex justify-between sm:mb-0 mb-5 ">
 								<div className="flex gap-2 items-center">
-									<CardTitle className="text-xl leading-tight font-bold">
+									<CardTitle className="text-xl leading-tight font-bold text-white/90">
 										{course.title}
 									</CardTitle>
 									<Badge
@@ -187,14 +188,14 @@ export function CourseCard({
 								</div>
 
 								{/* Mobile CRN */}
-								<Badge variant="outline" className="block md:hidden min-w-14">
+								<Badge variant="outline" className="block md:hidden min-w-14 ">
 									{course.crn || "N/A"}
 								</Badge>
 
 								{/* Section */}
 								<div className="hidden sm:flex items-center justify-center md:justify-end ml-auto mr-4 md:mr-0">
 									{course.section && (
-										<Badge variant="secondary" className="min-w-14">
+										<Badge  variant="secondary" className="min-w-14 text-white/90 border-white/15 bg-white/10">
 											{course.section}
 										</Badge>
 									)}
@@ -203,11 +204,12 @@ export function CourseCard({
 						</div>
 
 						{/* Mobile Footer Info */}
+						{/* TO FIX HERE VVVV MOBILE PORT */ }
 						<div className="flex gap-5 sm:hidden mt-2">
-							<Badge variant="secondary">{course.credits} Credits</Badge>
+							<Badge className="" variant="secondary">{course.credits} Credits</Badge>
 							<div className="flex items-center justify-center md:justify-end">
 								{course.section && (
-									<Badge variant="secondary" className="min-w-14">
+									<Badge variant="secondary" className="min-w-14 bg">
 										{course.section}
 									</Badge>
 								)}

@@ -4,6 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*make the page black by default, to kill the flash of white before the loader appears */
+html{ background-color: #000000; }
+
 body {
 	@apply m-0;
 	font-family:
