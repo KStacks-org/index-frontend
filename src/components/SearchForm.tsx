@@ -389,7 +389,7 @@ export function SearchForm({
 								variant="ghost"
 								size="sm"
 								type="button"
-								className="flex items-center gap-2 text-white/90"
+								className="flex items-center gap-2 text-white/90 hover:bg-white/10 hover:text-white/90"
 							>
 								<Filter className="h-4 w-4 text-white/90" /> Advanced Filters
 								{filtersOpen ? (

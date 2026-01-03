@@ -181,14 +181,14 @@ export function CourseCard({
 									</CardTitle>
 									<Badge
 										variant="outline"
-										className="block sm:hidden font-mono"
+										className="block sm:hidden font-mono text-white/90 border-white/15 bg-white/10"
 									>
 										{course.subject} {course.courseCode}
 									</Badge>
 								</div>
 
 								{/* Mobile CRN */}
-								<Badge variant="outline" className="block md:hidden min-w-14 ">
+								<Badge variant="outline" className="block md:hidden min-w-14  text-white/90 border-white/15 bg-white/10">
 									{course.crn || "N/A"}
 								</Badge>
 
@@ -206,10 +206,10 @@ export function CourseCard({
 						{/* Mobile Footer Info */}
 						{/* TO FIX HERE VVVV MOBILE PORT */ }
 						<div className="flex gap-5 sm:hidden mt-2">
-							<Badge className="" variant="secondary">{course.credits} Credits</Badge>
+							<Badge className=" text-white/90 border-white/15 bg-white/10" variant="secondary">{course.credits} Credits</Badge>
 							<div className="flex items-center justify-center md:justify-end">
 								{course.section && (
-									<Badge variant="secondary" className="min-w-14 bg">
+									<Badge variant="secondary" className="min-w-14  text-white/90 border-white/15 bg-white/10">
 										{course.section}
 									</Badge>
 								)}
