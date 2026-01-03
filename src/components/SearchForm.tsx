@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { SearchParams } from "../lib/api";
 import { DayMultiSelect } from "./DayMultiSelect";
 import { cn } from "@/lib/utils"; // Import cn utility
+import { ContextMenuSubTrigger } from "@radix-ui/react-context-menu";
 
 interface SearchFormProps {
 	initialValues?: Partial<SearchParams>;
@@ -128,10 +129,14 @@ export function SearchForm({
 	}, [query]);
 
 
+	// these are the main classes I used, even though they aren't used yet as a variable
+	// but will be useful for future refactoring or for the theme switcher/Modular theme system
+	// NOTE: these are not currently in use, just for future reference, and doesn't include everything, yet.
+	const generalGlassBackground = "bg-white/13 backdrop-blur-xl backdrop-saturate-100 border border-white/15 rounded-2xl shadow-lg w-full text-white/90 ";
 	const dropDownFocus =
 		"rounded-lg focus:bg-white/10 focus:text-white/80 hover:bg-white/10 hover:text-white/80 focus:outline-none";
 	const inputBoxTailwind = "h-9 bg-white/5 border border-white/10 rounded-md text-white/90"
-	const frostedSelectedContect = "bg-white/10 backdrop-blur-xl backdrop-saturate-150 border border-white/15 rounded-2xl shadow-lg  text-white/80 "
+	const frostedSelectedContect = "bg-white/10 backdrop-blur-xl backdrop-saturate-150 border border-white/15 rounded-2xl shadow-lg  text-white/80 ";
 
 	// --- FILTER FIELDS JSX (Reusable) ---
 	const filterFieldsContent = (
