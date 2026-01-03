@@ -20,11 +20,11 @@ export function ScheduleRow({
 						<div
 							key={d}
 							className={`
-                        w-8 h-8 flex items-center justify-center rounded text-xs font-bold border transition-colors
+                        w-8 h-8 flex items-center justify-center rounded text-xs font-bold border transition-colors 
                         ${
 													isDayActive(d)
 														? "bg-green-900 text-primary-foreground border-white/15"
-														: "bg-muted text-muted-foreground border-border"
+														: "bg-white/70 text-muted-foreground border-border "
 												}
                     `}
 						>
