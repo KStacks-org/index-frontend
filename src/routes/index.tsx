@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { KauHeader } from "@/components/KauHeader";
-import { SearchForm } from "@/components/SearchForm";
-import { KauFooter } from "@/components/KauFooter";
+import { KauHeader } from "@/components/layout/KauHeader";
+import { SearchForm } from "@/components/search/SearchForm";
+import { KauFooter } from "@/components/layout/KauFooter";
 
 export const Route = createFileRoute("/")({
 	component: KauIndexHome,

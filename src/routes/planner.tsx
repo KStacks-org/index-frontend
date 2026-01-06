@@ -1,12 +1,13 @@
 import { useState, useRef } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toPng } from "html-to-image";
 import { searchCourses, SearchParams } from "../lib/api";
-import { KauHeader } from "@/components/KauHeader";
-import { ScheduleCalendar } from "@/components/ScheduleCalendar";
-import { CourseCard } from "@/components/CourseCard";
-import { SearchForm } from "@/components/SearchForm";
+import { KauHeader } from "@/components/layout/KauHeader";
+import { ScheduleCalendar } from "@/components/planner/ScheduleCalendar";
+import { DesktopSchedule } from "@/components/planner/DesktopSchedule";
+import { PlannerCourseCard } from "@/components/planner/PlannerCourseCard";
+import { SearchForm } from "@/components/search/SearchForm";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import { Course, useScheduleStore } from "@/lib/schedule-store";
 import { parseTimeRange } from "@/lib/schedule-utils";
-import { KauFooter } from "@/components/KauFooter";
+import { KauFooter } from "@/components/layout/KauFooter";
 
 export const Route = createFileRoute("/planner")({
 	component: SchedulePage,
@@ -59,6 +60,7 @@ function SchedulePage() {
 
 	const selectedCourses = getActiveCourses();
 	const calendarRef = useRef<HTMLDivElement>(null);
+	const downloadRef = useRef<HTMLDivElement>(null);
 
 	// --- UI State ---
 	const [sidebarMode, setSidebarMode] = useState<"view" | "search">("view");
@@ -132,7 +134,11 @@ function SchedulePage() {
 		if (selectedCourses.some((c) => c.id === courseToCheck.id)) return [];
 
 		const conflicts = selectedCourses.filter((selected) => {
-			if (selected.courseCode === courseToCheck.courseCode) return true;
+			if (
+				selected.subject + selected.courseCode ===
+				courseToCheck.subject + courseToCheck.courseCode
+			)
+				return true;
 
 			return selected.schedules.some((selSched) => {
 				return courseToCheck.schedules.some((checkSched) => {
@@ -158,26 +164,15 @@ function SchedulePage() {
 	};
 
 	const handleDownload = async () => {
-		if (!calendarRef.current) return;
+		if (!downloadRef.current) return;
 		try {
 			setIsDownloading(true);
-			const element = calendarRef.current;
-			const width = element.scrollWidth;
-			const height = element.scrollHeight;
-
+			const element = downloadRef.current;
+			// Let html-to-image capture the element as-is (at full desktop width)
 			const dataUrl = await toPng(element, {
 				cacheBust: true,
 				backgroundColor: "#ffffff",
 				pixelRatio: 2,
-				width: width,
-				height: height,
-				style: {
-					width: `${width}px`,
-					height: `${height}px`,
-					overflow: "visible",
-					maxHeight: "none",
-					maxWidth: "none",
-				},
 			});
 
 			const link = document.createElement("a");
@@ -196,113 +191,126 @@ function SchedulePage() {
 		<div className="h-screen flex flex-col bg-background font-sans overflow-hidden">
 			<KauHeader />
 
-			<div className="hidden flex-1 md:flex overflow-hidden relative">
-				<main className="flex-1 p-4 overflow-y-auto bg-muted/10 w-full">
-					<div className="max-w-7xl mx-auto h-full flex flex-col">
-						<div className="flex justify-between items-center mb-4 px-2">
-							<div className="flex items-center gap-5">
-								<Button
-									variant="outline"
-									size="sm"
-									className="gap-2"
-									onClick={handleDownload}
-									disabled={isDownloading || selectedCourses.length === 0}
-								>
-									{isDownloading ? (
-										<Loader2 className="h-4 w-4 animate-spin" />
-									) : (
-										<Download className="h-4 w-4" />
-									)}
-								</Button>
-								<h1 className="text-2xl font-bold">Planner</h1>
+			{/* Main App Content: z-index 10 keeps it ABOVE the hidden download view */}
+			<div className="flex flex-1 md:flex overflow-hidden relative z-10 bg-background">
+				<main className="flex-1 p-2 md:p-4 overflow-hidden w-full flex flex-col">
+					<div className="max-w-7xl w-full mx-auto h-full flex flex-col">
+						{/* --- TOP BAR (Actions & Tabs) --- */}
+						<div className="flex flex-col gap-3 shrink-0">
+							<div className="flex justify-between items-center px-1">
+								<div className="flex items-center gap-3">
+									<h1 className="text-xl md:text-2xl font-bold">Planner</h1>
+									<Button
+										variant="outline"
+										size="icon"
+										className="h-8 w-8"
+										onClick={handleDownload}
+										disabled={isDownloading || selectedCourses.length === 0}
+										title="Download Image"
+									>
+										{isDownloading ? (
+											<Loader2 className="h-4 w-4 animate-spin" />
+										) : (
+											<Download className="h-4 w-4" />
+										)}
+									</Button>
+								</div>
+
+								<div className="flex gap-2">
+									<Button
+										variant="outline"
+										size="sm"
+										className="gap-2 h-8 md:h-9"
+										onClick={() => openSidebar("view")}
+									>
+										<BookOpen className="h-4 w-4" />
+										<span className="hidden sm:inline">My Courses</span>
+										<Badge
+											variant="secondary"
+											className="ml-1 h-5 px-1.5 min-w-5 justify-center"
+										>
+											{selectedCourses.length}
+										</Badge>
+									</Button>
+
+									<Button
+										size="sm"
+										className="gap-2 shadow-sm h-8 md:h-9"
+										onClick={() => openSidebar("search")}
+									>
+										<Plus className="h-4 w-4" />
+										<span className="hidden sm:inline">Add Course</span>
+										<span className="sm:hidden">Add</span>
+									</Button>
+								</div>
 							</div>
 
-							<div className="flex gap-2">
-								<Button
-									variant="outline"
-									size="sm"
-									className="gap-2"
-									onClick={() => openSidebar("view")}
-								>
-									<BookOpen className="h-4 w-4" />
-									<span className="hidden lg:inline">My Courses</span>
-									<Badge
-										variant="secondary"
-										className="ml-1 h-5 px-1.5 min-w-5"
+							{/* Row 2: Tabs */}
+							<div className="flex items-center gap-1 px-1 overflow-x-auto no-scrollbar relative z-20">
+								{" "}
+								{tabs.map((tab) => (
+									<div
+										key={tab.id}
+										onClick={() => setActiveTab(tab.id)}
+										className={cn(
+											"group flex items-center gap-2 px-3 md:px-4 py-2 rounded-t-lg border-t border-x cursor-pointer text-xs md:text-sm font-medium transition-all select-none relative top-px whitespace-nowrap",
+											activeTabId === tab.id
+												? "bg-background border-border text-foreground z-10"
+												: "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
+										)}
 									>
-										{selectedCourses.length}
-									</Badge>
-								</Button>
-
-								<Button
-									size="sm"
-									className="gap-2 shadow-sm"
-									onClick={() => openSidebar("search")}
+										<span className="max-w-20 md:max-w-none truncate">
+											{tab.name}
+										</span>
+										<span
+											className={cn(
+												"flex items-center justify-center rounded-full text-[9px] h-4 min-w-4 px-1",
+												activeTabId === tab.id
+													? "bg-primary/10 text-primary"
+													: "bg-black/5 dark:bg-white/10",
+											)}
+										>
+											{tab.courses.length}
+										</span>
+										{activeTabId === tab.id && (
+											<div className="flex items-center gap-0.5 ml-1 border-l pl-1 border-border/40">
+												<button
+													onClick={(e) => {
+														e.stopPropagation();
+														openRenameDialog(tab.id, tab.name);
+													}}
+													className="hover:text-primary transition-colors p-1 rounded hover:bg-muted"
+												>
+													<Edit className="h-3 w-3" />
+												</button>
+												<button
+													onClick={(e) => {
+														e.stopPropagation();
+														openDeleteDialog(tab.id, tab.name);
+													}}
+													disabled={tabs.length <= 1}
+													className="hover:text-destructive transition-colors disabled:opacity-30 p-1 rounded hover:bg-destructive/10"
+												>
+													<X className="h-3 w-3" />
+												</button>
+											</div>
+										)}
+									</div>
+								))}
+								<button
+									onClick={() => addTab(`Schedule ${tabs.length + 1}`)}
+									disabled={tabs.length >= 5}
+									className="ml-1 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
 								>
 									<Plus className="h-4 w-4" />
-									<span>Find Courses</span>
-								</Button>
+								</button>
 							</div>
 						</div>
 
-						<div className="flex items-center gap-1 mb-0 px-1 overflow-x-auto">
-							{tabs.map((tab) => (
-								<div
-									key={tab.id}
-									onClick={() => setActiveTab(tab.id)}
-									className={cn(
-										"group flex items-center gap-2 px-4 py-2 rounded-t-lg border-t border-x cursor-pointer text-sm font-medium transition-all select-none relative top-px",
-										activeTabId === tab.id
-											? "bg-background border-border text-foreground z-10"
-											: "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
-									)}
-								>
-									<span>{tab.name}</span>
-									<span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-										{tab.courses.length}
-									</span>
-
-									{activeTabId === tab.id && (
-										<div className="flex items-center gap-1 ml-2 border-l pl-2 border-border/40">
-											<button
-												onClick={(e) => {
-													e.stopPropagation();
-													openRenameDialog(tab.id, tab.name);
-												}}
-												className="hover:text-primary transition-colors p-0.5 rounded hover:bg-muted"
-											>
-												<Edit className="h-3 w-3" />
-											</button>
-											<button
-												onClick={(e) => {
-													e.stopPropagation();
-													openDeleteDialog(tab.id, tab.name);
-												}}
-												disabled={tabs.length <= 1}
-												className="hover:text-destructive transition-colors disabled:opacity-30 p-0.5 rounded hover:bg-destructive/10"
-											>
-												<X className="h-3 w-3" />
-											</button>
-										</div>
-									)}
-								</div>
-							))}
-
-							<button
-								onClick={() => addTab(`Schedule ${tabs.length + 1}`)}
-								disabled={tabs.length >= 5}
-								className="ml-1 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-								title={
-									tabs.length >= 5 ? "Max 5 schedules reached" : "New Schedule"
-								}
-							>
-								<Plus className="h-4 w-4" />
-							</button>
-						</div>
-
+						{/* --- RESPONSIVE CALENDAR AREA --- */}
 						<div className="flex-1 bg-background rounded-b-xl rounded-tr-xl border shadow-sm overflow-hidden flex flex-col min-h-0 z-0 relative">
-							<div className="flex-1 overflow-auto">
-								<div className="min-w-200 h-full" ref={calendarRef}>
+							<div className="flex-1 overflow-auto bg-muted/5">
+								<div className="min-w-fit h-full p-2 md:p-0" ref={calendarRef}>
 									<ScheduleCalendar />
 								</div>
 							</div>
@@ -313,24 +321,23 @@ function SchedulePage() {
 				<Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
 					<SheetContent
 						side="right"
-						className="w-100 sm:w-135 p-0 flex flex-col h-full bg-card"
+						className="w-screen sm:w-135 p-0 flex flex-col h-full bg-card"
 					>
-						<SheetHeader className="p-4 border-b shrink-0">
+						<SheetHeader className="p-4 border-b shrink-0 flex flex-row items-center justify-between space-y-0">
 							<SheetTitle className="flex items-center gap-2 text-lg">
 								{sidebarMode === "search" ? (
 									<>
-										<SearchIcon className="h-5 w-5 text-muted-foreground" />
+										<SearchIcon className="h-5 w-5 text-muted-foreground" />{" "}
 										Find Courses
 									</>
 								) : (
 									<>
-										<BookOpen className="h-5 w-5 text-muted-foreground" />
-										My Courses
+										<BookOpen className="h-5 w-5 text-muted-foreground" /> My
+										Courses
 									</>
 								)}
 							</SheetTitle>
 						</SheetHeader>
-
 						<div className="flex-1 overflow-y-auto bg-muted/5 relative">
 							{sidebarMode === "search" && (
 								<div className="flex flex-col min-h-full">
@@ -344,33 +351,26 @@ function SchedulePage() {
 											onSearch={handleLocalSearch}
 										/>
 									</div>
-
 									<div className="flex-1 p-4 space-y-3">
 										{isLoading && (
 											<div className="flex justify-center py-10">
 												<Loader2 className="h-8 w-8 animate-spin text-primary/50" />
 											</div>
 										)}
-
 										{!isLoading && data?.data?.length === 0 && (
 											<div className="text-center py-20 text-muted-foreground text-sm">
 												No courses found matching your filters.
 											</div>
 										)}
-
 										{data?.data?.map((course) => (
-											<CourseCard
+											<PlannerCourseCard
 												key={course.id}
 												course={course}
-												compact={true}
-												conflict={
-													checkConflict(course).length > 0 ? true : false
-												}
+												conflict={checkConflict(course).length > 0}
 												conflictCourse={checkConflict(course)}
 											/>
 										))}
 									</div>
-
 									{data && data.meta.totalPages > 1 && (
 										<div className="p-3 border-t bg-background flex items-center justify-between text-xs sticky bottom-0 z-20">
 											<span className="text-muted-foreground">
@@ -400,7 +400,6 @@ function SchedulePage() {
 									)}
 								</div>
 							)}
-
 							{sidebarMode === "view" && (
 								<div className="p-4 space-y-3">
 									{selectedCourses.length === 0 ? (
@@ -419,10 +418,10 @@ function SchedulePage() {
 										</div>
 									) : (
 										selectedCourses.map((course) => (
-											<CourseCard
+											<PlannerCourseCard
+												noOutline
 												key={course.id}
 												course={course}
-												compact={true}
 											/>
 										))
 									)}
@@ -433,17 +432,35 @@ function SchedulePage() {
 				</Sheet>
 			</div>
 
-			<div className="flex flex-col justify-center items-center w-full h-full md:hidden px-4 text-center">
-				<span className="text-sm opacity-80 bg-destructive/10 text-destructive border border-destructive/20 px-4 py-3 rounded-lg mb-8 max-w-xs">
-					Mobile view is currently under development. Please use a desktop
-					browser.
-				</span>
-				<Button variant="secondary" asChild>
-					<Link to="/">Return Home</Link>
-				</Button>
+			{/* --- HIDDEN DESKTOP CALENDAR FOR DOWNLOAD --- */}
+			{/* Position: fixed at 0,0 ensures it's 'on screen' for the renderer, but z-index -50 hides it behind the app background */}
+			<div
+				ref={downloadRef}
+				style={{
+					position: "fixed",
+					left: 0,
+					top: 0,
+					width: "1500px", // Force desktop width
+					height: "1200px",
+					zIndex: -50,
+					visibility: "visible",
+				}}
+				className="bg-background p-8 flex flex-col pointer-events-none"
+			>
+				<div className="mb-6 px-2">
+					<h1 className="text-3xl font-bold">
+						{tabs.find((t) => t.id === activeTabId)?.name || "Schedule"}
+					</h1>
+					<p className="text-muted-foreground text-lg mt-1">
+						{selectedCourses.length} Courses
+					</p>
+				</div>
+				<div className="flex-1 border rounded-xl overflow-hidden shadow-sm">
+					<DesktopSchedule />
+				</div>
 			</div>
 
-			{/* --- RENAME DIALOG --- */}
+			{/* Dialogs */}
 			<Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
@@ -473,8 +490,6 @@ function SchedulePage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-
-			{/* --- DELETE DIALOG --- */}
 			<Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
@@ -484,7 +499,7 @@ function SchedulePage() {
 							<span className="font-medium text-foreground">
 								"{tabToEdit?.name}"
 							</span>
-							? This action cannot be undone.
+							?
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -500,7 +515,10 @@ function SchedulePage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-			<KauFooter />
+
+			<div className="hidden md:block">
+				<KauFooter />
+			</div>
 		</div>
 	);
 }

@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Info } from "lucide-react";
-import { KauHeader } from "@/components/KauHeader";
+import { KauHeader } from "@/components/layout/KauHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
-import { KauFooter } from "@/components/KauFooter";
+import { KauFooter } from "@/components/layout/KauFooter";
 
 // Official X Logo Component
 const XLogo = ({ className }: { className?: string }) => (
@@ -64,7 +64,11 @@ function AboutPage() {
 					<div className="text-center space-y-6">
 						<div className="space-y-2">
 							<h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-								About <span className="text-green-400">KAUIndex</span>
+								{/* FIX: Use conditional green for readability in light mode */}
+								About{" "}
+								<span className="text-green-600 dark:text-green-400">
+									KAUIndex
+								</span>
 							</h1>
 							{/* Project X Link */}
 							<a
@@ -113,13 +117,15 @@ function AboutPage() {
 									className="bg-card/50 hover:bg-card hover:shadow-md transition-all duration-300 border-border"
 								>
 									<CardHeader className="flex flex-col items-center pb-2">
-										<Avatar className={cn("h-16 w-16 mb-2 border-2 bg-black")}>
+										<Avatar className={cn("h-16 w-16 mb-2 border-2 bg-muted")}>
 											<AvatarImage
-												className={cn("scale-[" + member.zoomLevel + "%]")}
+												className={cn(
+													"bg-black scale-[" + member.zoomLevel + "%]",
+												)}
 												src={member.imagePath}
 												alt={member.name}
 											/>
-											<AvatarFallback className="bg-green-400/10 text-green-400 font-bold text-xl">
+											<AvatarFallback className="bg-black text-green-700 dark:text-green-400 font-bold text-xl">
 												{member.initials}
 											</AvatarFallback>
 										</Avatar>
@@ -128,7 +134,6 @@ function AboutPage() {
 											<CardTitle className="text-xl font-bold">
 												{member.name}
 											</CardTitle>
-											{/* Member X Link */}
 											<a
 												href={member.x}
 												target="_blank"

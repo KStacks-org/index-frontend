@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { searchCourses, SearchParams } from "../lib/api";
-import { KauHeader } from "@/components/KauHeader";
-import { SearchForm } from "@/components/SearchForm";
-import { CourseCard } from "@/components/CourseCard";
+import { KauHeader } from "@/components/layout/KauHeader";
 import { Loader2, FilterX, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { KauFooter } from "@/components/KauFooter";
+import { KauFooter } from "@/components/layout/KauFooter";
+import { SearchForm } from "@/components/search/SearchForm";
+import { SearchCourseCard } from "@/components/search/SearchCourseCard";
 
 interface CourseSearchSchema {
 	q?: string;
@@ -216,7 +216,7 @@ function SearchPage() {
 								) : (
 									<>
 										{data.data.map((course) => (
-											<CourseCard key={course.id} course={course} />
+											<SearchCourseCard key={course.id} course={course} />
 										))}
 
 										{/* PAGINATION CONTROLS */}

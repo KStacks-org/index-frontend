@@ -7,6 +7,7 @@ import {
 import appCss from "../styles.css?url";
 
 import type { QueryClient } from "@tanstack/react-query";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -78,16 +79,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang="en">
 			<head>
 				<HeadContent />
-				{/* --- Global AdSense Script --- */}
-				<script
-					async
-					src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1756288586646493"
-					crossOrigin="anonymous"
-				/>
-				{/* ----------------------------- */}
 			</head>
 			<body>
-				{children}
+				<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+					{children}
+				</ThemeProvider>
 				<Scripts />
 			</body>
 		</html>
