@@ -47,6 +47,13 @@ export const Route = createFileRoute("/planner")({
 	component: SchedulePage,
 });
 
+/**
+ * Render the Planner page UI including schedule tabs, the calendar view, a right-side sheet for viewing/searching courses, dialogs for renaming/deleting schedules, and a hidden desktop viewport used for exporting the schedule as an image.
+ *
+ * The component coordinates schedule store actions (tab management and active courses), search pagination, conflict detection for course times, and download/export behavior.
+ *
+ * @returns The React element tree for the Planner page.
+ */
 function SchedulePage() {
 	// --- Store Hooks ---
 	const {
@@ -177,7 +184,7 @@ function SchedulePage() {
 			// Let html-to-image capture the element as-is (at full desktop width)
 			const dataUrl = await toPng(element, {
 				cacheBust: true,
-				backgroundColor: isDark ? "#030712" : "#ffffff",
+				backgroundColor: isDark ? "#0a0a0a" : "#ffffff",
 				pixelRatio: 2,
 				skipFonts: true,
 			});
