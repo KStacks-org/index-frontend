@@ -23,7 +23,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { SearchParams } from "@/lib/api"; // Fixed path alias
+import { SearchParams } from "@/lib/api";
 import { DayMultiSelect } from "./DayMultiSelect";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +47,17 @@ export function SearchForm({
 	const navigate = useNavigate();
 
 	const [filtersOpen, setFiltersOpen] = useState(false);
+
+	useEffect(() => {
+		if (layout === "sidebar" && overlayFilters && filtersOpen) {
+			document.body.style.overflow = "hidden";
+		} else {
+			document.body.style.overflow = "unset";
+		}
+		return () => {
+			document.body.style.overflow = "unset";
+		};
+	}, [filtersOpen, layout, overlayFilters]);
 
 	// --- STATE ---
 	const [termCode, setTermCode] = useState(initialValues?.termCode || "202602");
@@ -212,7 +223,6 @@ export function SearchForm({
 			</div>
 
 			{/* Day Select */}
-			{/* Ensure DayMultiSelect uses shadcn components inside */}
 			<DayMultiSelect value={dayFilter} onChange={setDayFilter} />
 
 			{/* Time Range */}
@@ -276,33 +286,31 @@ export function SearchForm({
 				onSubmit={handleSearch}
 				className="flex flex-col gap-4 w-full relative"
 			>
-				{/* Search Input */}
+				{/* Top Row: Reset and Search */}
 				<div className="flex gap-2">
 					{!dropDown && (
 						<Button
 							disabled={isLoading}
 							onClick={handleReset}
 							type="button"
-							variant={"outline"}
-							size="icon" // Optimized for square icon buttons
+							variant="outline"
+							size="icon"
 							className="h-10 w-10 shrink-0"
 						>
 							<RotateCw className="h-4 w-4" />
 						</Button>
 					)}
-
 					<div className="relative w-full z-20">
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
 						<Input
 							placeholder="Course, code..."
 							className="pl-9 h-10 bg-background"
-							value={query}
+							value={query ?? ""}
 							onChange={(e) => setQuery(e.target.value)}
 						/>
 					</div>
 				</div>
 
-				{/* Filters Collapse */}
 				<Collapsible
 					open={!dropDown ? true : filtersOpen}
 					onOpenChange={setFiltersOpen}
@@ -310,28 +318,21 @@ export function SearchForm({
 				>
 					{dropDown && (
 						<div className="grid grid-cols-8 gap-1">
-							<CollapsibleTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									type="button"
-									className="col-span-7 h-9 flex justify-between bg-background hover:bg-accent hover:text-accent-foreground"
-								>
-									<span className="flex items-center gap-2">
-										<Filter className="h-3 w-3" /> Filters
-									</span>
-									{filtersOpen ? (
-										<ChevronUp className="h-3 w-3" />
-									) : (
-										<ChevronDown className="h-3 w-3" />
-									)}
-								</Button>
+							<CollapsibleTrigger className="col-span-7 h-9 flex items-center justify-between px-3 py-2 bg-background border hover:bg-accent transition-colors">
+								<span className="flex items-center gap-2 text-sm font-medium">
+									<Filter className="h-3 w-3" /> Filters
+								</span>
+								{filtersOpen ? (
+									<ChevronUp className="h-3 w-3" />
+								) : (
+									<ChevronDown className="h-3 w-3" />
+								)}
 							</CollapsibleTrigger>
 							<Button
 								disabled={isLoading}
 								onClick={handleReset}
 								type="button"
-								variant={"outline"}
+								variant="outline"
 								size="icon"
 								className="h-9 w-full"
 							>
@@ -342,23 +343,37 @@ export function SearchForm({
 
 					<CollapsibleContent
 						className={cn(
-							// Changed bg-muted/20 to bg-muted/50 for better dark mode visibility
-							"space-y-4 pt-2 border p-3 bg-muted/50",
-							overlayFilters &&
-								"absolute top-full left-0 right-0 mt-2 bg-popover shadow-xl border-border z-50 animate-in fade-in zoom-in-95 duration-200",
+							"border bg-muted/50 transition-all duration-200",
+							overlayFilters && [
+								"absolute top-full left-0 right-0 mt-2 z-50",
+								"bg-popover shadow-xl border-border",
+								"max-h-[calc(100vh-220px)] overflow-y-auto overscroll-contain scrollbar-thin",
+								"animate-in fade-in zoom-in-95",
+							],
 						)}
 					>
-						{filterFieldsContent}
+						{/* FIX 3: Added pb-10 to create a buffer at the bottom so the button is fully visible */}
+						<div className="p-3 space-y-4 pb-10">
+							{filterFieldsContent}
 
-						<Button type="submit" className="w-full font-medium">
-							{isLoading ? (
-								<Loader2 className="animate-spin h-4 w-4" />
-							) : (
-								"Apply Filters"
-							)}
-						</Button>
+							<Button type="submit" className="w-full font-medium">
+								{isLoading ? (
+									<Loader2 className="animate-spin h-4 w-4" />
+								) : (
+									"Apply Filters"
+								)}
+							</Button>
+						</div>
 					</CollapsibleContent>
 				</Collapsible>
+
+				{/* Backdrop */}
+				{overlayFilters && filtersOpen && (
+					<div
+						className="fixed inset-0 z-20 bg-black/5"
+						onClick={() => setFiltersOpen(false)}
+					/>
+				)}
 			</form>
 		);
 	}
