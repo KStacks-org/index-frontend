@@ -41,6 +41,7 @@ import {
 import { Course, useScheduleStore } from "@/lib/schedule-store";
 import { parseTimeRange } from "@/lib/schedule-utils";
 import { KauFooter } from "@/components/layout/KauFooter";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 export const Route = createFileRoute("/planner")({
 	component: SchedulePage,
@@ -76,6 +77,11 @@ function SchedulePage() {
 	} | null>(null);
 	const [newName, setNewName] = useState("");
 
+	const { theme } = useTheme();
+	const isDark =
+		theme === "dark" ||
+		(theme === "system" &&
+			window.matchMedia("(prefers-color-scheme: dark)").matches);
 	// --- Search State ---
 	const [localFilters, setLocalFilters] = useState<Partial<SearchParams>>({
 		termCode: "202602",
@@ -171,8 +177,9 @@ function SchedulePage() {
 			// Let html-to-image capture the element as-is (at full desktop width)
 			const dataUrl = await toPng(element, {
 				cacheBust: true,
-				backgroundColor: "#ffffff",
+				backgroundColor: isDark ? "#030712" : "#ffffff",
 				pixelRatio: 2,
+				skipFonts: true,
 			});
 
 			const link = document.createElement("a");
@@ -433,7 +440,6 @@ function SchedulePage() {
 			</div>
 
 			{/* --- HIDDEN DESKTOP CALENDAR FOR DOWNLOAD --- */}
-			{/* Position: fixed at 0,0 ensures it's 'on screen' for the renderer, but z-index -50 hides it behind the app background */}
 			<div
 				ref={downloadRef}
 				style={{
