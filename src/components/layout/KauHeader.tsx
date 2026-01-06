@@ -113,7 +113,7 @@ export function KauHeader() {
 								<Link
 									to="/"
 									onClick={() => setOpen(false)}
-									className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted rounded-md transition-colors"
+									className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted transition-colors"
 									activeProps={{
 										className: "bg-muted text-green-600 dark:text-green-400",
 									}}
@@ -125,7 +125,7 @@ export function KauHeader() {
 								<Link
 									to="/planner"
 									onClick={() => setOpen(false)}
-									className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted rounded-md transition-colors"
+									className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted transition-colors"
 									activeProps={{
 										className: "bg-muted text-green-600 dark:text-green-400",
 									}}
@@ -137,7 +137,7 @@ export function KauHeader() {
 								<Link
 									to="/about"
 									onClick={() => setOpen(false)}
-									className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted rounded-md transition-colors"
+									className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted transition-colors"
 									activeProps={{
 										className: "bg-muted text-green-600 dark:text-green-400",
 									}}

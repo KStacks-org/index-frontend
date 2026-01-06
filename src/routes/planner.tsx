@@ -253,7 +253,7 @@ function SchedulePage() {
 										key={tab.id}
 										onClick={() => setActiveTab(tab.id)}
 										className={cn(
-											"group flex items-center gap-2 px-3 md:px-4 py-2 rounded-t-lg border-t border-x cursor-pointer text-xs md:text-sm font-medium transition-all select-none relative top-px whitespace-nowrap",
+											"group flex items-center gap-2 px-3 md:px-4 py-2 border-t border-x cursor-pointer text-xs md:text-sm font-medium transition-all select-none relative top-px whitespace-nowrap",
 											activeTabId === tab.id
 												? "bg-background border-border text-foreground z-10"
 												: "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -264,7 +264,7 @@ function SchedulePage() {
 										</span>
 										<span
 											className={cn(
-												"flex items-center justify-center rounded-full text-[9px] h-4 min-w-4 px-1",
+												"flex items-center justify-center text-[9px] h-4 min-w-4 px-1",
 												activeTabId === tab.id
 													? "bg-primary/10 text-primary"
 													: "bg-black/5 dark:bg-white/10",
@@ -279,7 +279,7 @@ function SchedulePage() {
 														e.stopPropagation();
 														openRenameDialog(tab.id, tab.name);
 													}}
-													className="hover:text-primary transition-colors p-1 rounded hover:bg-muted"
+													className="hover:text-primary transition-colors p-1 hover:bg-muted"
 												>
 													<Edit className="h-3 w-3" />
 												</button>
@@ -289,7 +289,7 @@ function SchedulePage() {
 														openDeleteDialog(tab.id, tab.name);
 													}}
 													disabled={tabs.length <= 1}
-													className="hover:text-destructive transition-colors disabled:opacity-30 p-1 rounded hover:bg-destructive/10"
+													className="hover:text-destructive transition-colors disabled:opacity-30 p-1 hover:bg-destructive/10"
 												>
 													<X className="h-3 w-3" />
 												</button>
@@ -300,7 +300,7 @@ function SchedulePage() {
 								<button
 									onClick={() => addTab(`Schedule ${tabs.length + 1}`)}
 									disabled={tabs.length >= 5}
-									className="ml-1 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+									className="ml-1 p-1.5 hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
 								>
 									<Plus className="h-4 w-4" />
 								</button>
@@ -308,7 +308,7 @@ function SchedulePage() {
 						</div>
 
 						{/* --- RESPONSIVE CALENDAR AREA --- */}
-						<div className="flex-1 bg-background rounded-b-xl rounded-tr-xl border shadow-sm overflow-hidden flex flex-col min-h-0 z-0 relative">
+						<div className="flex-1 bg-background border shadow-sm overflow-hidden flex flex-col min-h-0 z-0 relative">
 							<div className="flex-1 overflow-auto bg-muted/5">
 								<div className="min-w-fit h-full p-2 md:p-0" ref={calendarRef}>
 									<ScheduleCalendar />
@@ -404,7 +404,7 @@ function SchedulePage() {
 								<div className="p-4 space-y-3">
 									{selectedCourses.length === 0 ? (
 										<div className="text-center py-24 flex flex-col items-center text-muted-foreground">
-											<div className="bg-muted p-4 rounded-full mb-3 opacity-50">
+											<div className="bg-muted p-4 mb-3 opacity-50">
 												<Plus className="h-6 w-6" />
 											</div>
 											<p className="font-medium">Your schedule is empty</p>
@@ -455,7 +455,7 @@ function SchedulePage() {
 						{selectedCourses.length} Courses
 					</p>
 				</div>
-				<div className="flex-1 border rounded-xl overflow-hidden shadow-sm">
+				<div className="flex-1 border overflow-hidden shadow-sm">
 					<DesktopSchedule />
 				</div>
 			</div>

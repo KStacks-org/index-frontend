@@ -20,7 +20,7 @@ export function MobileSchedule() {
 
 	if (selectedCourses.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center text-center p-8 min-h-100 border border-dashed rounded-xl bg-muted/10">
+			<div className="flex flex-col items-center justify-center text-center p-8 min-h-100 border border-dashed bg-muted/10">
 				<CalendarIcon className="h-12 w-12 text-muted-foreground/50 mb-4" />
 				<p className="font-semibold text-lg text-foreground">
 					Your schedule is empty
@@ -105,7 +105,7 @@ function MobileCourseCard({
 				onClick={() => setOpen(true)}
 				style={{ "--course-hue": hue } as React.CSSProperties}
 				className={cn(
-					"flex flex-col gap-2 p-4 rounded-lg border cursor-pointer transition-colors active:scale-[0.98]",
+					"flex flex-col gap-2 p-4 border cursor-pointer transition-colors active:scale-[0.98]",
 					"bg-[hsla(var(--course-hue),85%,60%,0.10)]",
 					"border-[hsla(var(--course-hue),70%,45%,0.3)] dark:border-[hsla(var(--course-hue),70%,60%,0.3)]",
 				)}
@@ -140,7 +140,7 @@ function MobileCourseCard({
 
 			{/* Reusing a similar Dialog for details */}
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="sm:max-w-md w-[90%] rounded-lg">
+				<DialogContent className="sm:max-w-md w-[90%]">
 					<DialogHeader>
 						<DialogTitle className="text-xl flex items-center gap-2">
 							{course.title}

@@ -343,7 +343,7 @@ export function SearchForm({
 					<CollapsibleContent
 						className={cn(
 							// Changed bg-muted/20 to bg-muted/50 for better dark mode visibility
-							"space-y-4 pt-2 border rounded-md p-3 bg-muted/50",
+							"space-y-4 pt-2 border p-3 bg-muted/50",
 							overlayFilters &&
 								"absolute top-full left-0 right-0 mt-2 bg-popover shadow-xl border-border z-50 animate-in fade-in zoom-in-95 duration-200",
 						)}
@@ -366,10 +366,7 @@ export function SearchForm({
 	// --- LAYOUT: HERO MODE ---
 	return (
 		<div className="w-full max-w-3xl mx-auto">
-			<form
-				onSubmit={handleSearch}
-				className="flex gap-2 mb-4 relative rounded-lg"
-			>
+			<form onSubmit={handleSearch} className="flex gap-2 mb-4 relative">
 				<div className="relative flex-1">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
 					<Input
@@ -387,10 +384,10 @@ export function SearchForm({
 					{isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : "Search"}
 				</Button>
 			</form>
-			<div className="bg-card border border-border rounded-lg p-1 shadow-sm">
+			<div className="bg-card border border-border p-1 shadow-sm">
 				<Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
 					<CollapsibleTrigger asChild>
-						<div className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 rounded-md transition-colors">
+						<div className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors">
 							<Button
 								variant="ghost"
 								size="sm"

@@ -39,8 +39,8 @@ export function DesktopSchedule() {
 
 	if (selectedCourses.length === 0) {
 		return (
-			<div className="h-full w-full rounded-xl border border-dashed border-muted-foreground/25 bg-muted/10 flex flex-col items-center justify-center text-center p-8 min-h-100">
-				<div className="bg-background p-4 rounded-full mb-4 shadow-sm border border-border">
+			<div className="h-full w-full border border-dashed border-muted-foreground/25 bg-muted/10 flex flex-col items-center justify-center text-center p-8 min-h-100">
+				<div className="bg-background p-4 mb-4 shadow-sm border border-border">
 					<CalendarIcon className="h-8 w-8 text-muted-foreground/50" />
 				</div>
 				<p className="font-semibold text-lg text-foreground">
@@ -54,7 +54,7 @@ export function DesktopSchedule() {
 	}
 
 	return (
-		<div className="flex flex-col h-full bg-background rounded-xl rounded-tl-none border border-border overflow-hidden w-full shadow-sm relative">
+		<div className="flex flex-col h-full bg-background border border-border overflow-hidden w-full shadow-sm relative">
 			{/* HEADER ROW (Days) */}
 			<div className="flex border-b border-border bg-muted/30 h-8 md:h-10 shrink-0 z-20 relative">
 				<div className="w-14 border-r border-border bg-muted/30 shrink-0"></div>

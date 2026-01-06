@@ -135,7 +135,7 @@ function SearchPage() {
 				<div className="flex flex-col lg:flex-row gap-8">
 					{/* SIDEBAR */}
 					<aside className="w-full lg:w-72 shrink-0">
-						<div className="sticky top-24 bg-card p-4 rounded-lg border border-border">
+						<div className="sticky top-24 bg-card p-4 border border-border">
 							<div className="block lg:hidden">
 								<SearchForm
 									initialValues={searchParams}
@@ -177,7 +177,7 @@ function SearchPage() {
 
 						{/* Loading State */}
 						{isLoading && (
-							<div className="w-full text-center py-32 rounded-lg border-2 border-dashed border-border">
+							<div className="w-full text-center py-32 border-2 border-dashed border-border">
 								<Loader2 className="animate-spin h-10 w-10 text-green-400 mx-auto" />
 								<p className="mt-4 text-muted-foreground">
 									Fetching courses...
@@ -187,7 +187,7 @@ function SearchPage() {
 
 						{/* Error State */}
 						{isError && (
-							<div className="w-full text-center py-20 text-destructive bg-destructive/10 rounded-lg border border-destructive/20">
+							<div className="w-full text-center py-20 text-destructive bg-destructive/10 border border-destructive/20">
 								<p className="font-medium">Connection Error</p>
 								<p className="text-sm opacity-70 mt-1">
 									{(error as Error).message}
@@ -199,8 +199,8 @@ function SearchPage() {
 						{data && (
 							<div className="space-y-4 animate-in slide-in-from-bottom-4 duration-500">
 								{data.data.length === 0 ? (
-									<div className="text-center py-20 border-2 border-dashed border-border rounded-lg bg-card">
-										<div className="bg-muted p-4 rounded-full inline-block mb-4">
+									<div className="text-center py-20 border-2 border-dashed border-border bg-card">
+										<div className="bg-muted p-4 inline-block mb-4">
 											<FilterX className="h-8 w-8 text-muted-foreground" />
 										</div>
 										<p className="text-muted-foreground text-lg mb-4">

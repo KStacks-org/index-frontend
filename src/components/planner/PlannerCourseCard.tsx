@@ -10,14 +10,14 @@ interface PlannerCourseCardProps {
 	course: Course;
 	conflict?: boolean;
 	conflictCourse?: Course[];
-	noOutline?: boolean; // Added prop to control border visibility
+	noOutline?: boolean;
 }
 
 export function PlannerCourseCard({
 	course,
 	conflict = false,
 	conflictCourse: conflictCourses,
-	noOutline = false, // Default to false so existing layouts don't break
+	noOutline = false,
 }: PlannerCourseCardProps) {
 	const { addCourse, removeCourse, isCourseSelected } = useScheduleStore();
 	const selected = isCourseSelected(course.id);
@@ -46,19 +46,20 @@ export function PlannerCourseCard({
 	return (
 		<div
 			className={cn(
-				"relative rounded-lg bg-card text-card-foreground transition-all duration-200 overflow-hidden",
-				// Conditional base border
-				!noOutline && "border border-border",
-				// Selected state adjustments
-				selected
-					? noOutline
-						? "bg-primary/5"
-						: "border-primary/50 bg-primary/5"
-					: !noOutline && "hover:border-primary/50",
-				// Conflict state adjustments
-				conflict && !selected
-					? "opacity-80 bg-muted/30 border-dashed border-destructive/50"
-					: "",
+				"relative bg-card text-card-foreground transition-all duration-200 overflow-hidden",
+
+				"border border-border",
+
+				!noOutline &&
+					selected &&
+					"border-primary/50 ring-1 ring-primary/20 bg-primary/5",
+
+				!noOutline && !selected && "hover:border-primary/50",
+
+				!noOutline &&
+					conflict &&
+					!selected &&
+					"opacity-80 bg-muted/30 border-dashed border-destructive/50",
 			)}
 		>
 			<div className="p-3 flex items-start gap-3">
@@ -66,7 +67,7 @@ export function PlannerCourseCard({
 					{/* Header Row: Code, CRN, Section */}
 					<div className="flex flex-wrap items-center gap-2 mb-1.5">
 						<div
-							className="w-4 h-4 rounded-full shadow-sm"
+							className="w-4 h-4 shadow-sm"
 							style={{
 								backgroundColor: `hsl(${hue}, 85%, 60%)`,
 							}}
@@ -86,7 +87,7 @@ export function PlannerCourseCard({
 						)}
 
 						{course.section && (
-							<span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-sm">
+							<span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5">
 								{course.section}
 							</span>
 						)}
@@ -149,7 +150,7 @@ export function PlannerCourseCard({
 
 					{/* Conflict Warning Overlay */}
 					{(conflictCourses?.length ?? 0) > 0 && !selected && (
-						<div className="mt-2 w-full text-[10px] text-destructive flex items-center gap-1 font-medium bg-destructive/5 p-1 rounded">
+						<div className="mt-2 w-full text-[10px] text-destructive flex items-center gap-1 font-medium bg-destructive/5 p-1">
 							<span>
 								Conflict:{" "}
 								{conflictCourses

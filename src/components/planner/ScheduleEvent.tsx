@@ -38,7 +38,7 @@ export function ScheduleEvent({
 					} as React.CSSProperties
 				}
 				className={cn(
-					"absolute left-[2%] w-[96%] rounded-md px-1 py-0.5 md:px-1.5 md:py-1 leading-none border shadow-sm z-10 overflow-hidden group flex flex-col justify-start cursor-pointer transition-all duration-200 hover:brightness-95 dark:hover:brightness-110",
+					"absolute left-[2%] w-[96%] px-1 py-0.5 md:px-1.5 md:py-1 leading-none border shadow-sm z-10 overflow-hidden group flex flex-col justify-start cursor-pointer transition-all duration-200 hover:brightness-95 dark:hover:brightness-110",
 					// Dynamic Colors
 					"bg-[hsla(var(--course-hue),85%,60%,0.15)]",
 					"border-[hsla(var(--course-hue),70%,45%,0.3)] dark:border-[hsla(var(--course-hue),70%,60%,0.3)]",

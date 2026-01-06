@@ -11,7 +11,7 @@ export function ScheduleRow({
 		schedule.days && schedule.days.includes(dayChar);
 
 	return (
-		<div className="flex flex-col gap-3 p-3 rounded-md bg-card border border-border transition-all group text-center">
+		<div className="flex flex-col gap-3 p-3 bg-card border border-border transition-all group text-center">
 			{/* ROW 1 */}
 			<div className="flex w-full pb-2 border-b border-border/50">
 				{/* 1. Days */}
@@ -20,7 +20,7 @@ export function ScheduleRow({
 						<div
 							key={d}
 							className={`
-                        w-8 h-8 flex items-center justify-center rounded text-xs font-bold border transition-colors
+                        w-8 h-8 flex items-center justify-center text-xs font-bold border transition-colors
                         ${
 													isDayActive(d)
 														? "bg-primary text-primary-foreground border-primary"

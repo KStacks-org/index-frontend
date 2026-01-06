@@ -75,7 +75,7 @@ function AboutPage() {
 								href={PROJECT_X_URL}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1 px-3 rounded-full bg-secondary/50 border border-border/50"
+								className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1 px-3 bg-secondary/50 border border-border/50"
 							>
 								<XLogo className="h-3 w-3" />
 								<span>Follow @KAUIndex</span>
