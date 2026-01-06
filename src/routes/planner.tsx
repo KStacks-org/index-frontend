@@ -177,7 +177,7 @@ function SchedulePage() {
 			// Let html-to-image capture the element as-is (at full desktop width)
 			const dataUrl = await toPng(element, {
 				cacheBust: true,
-				backgroundColor: isDark ? "#030712" : "#ffffff",
+				backgroundColor: isDark ? "#0a0a0a" : "#ffffff",
 				pixelRatio: 2,
 				skipFonts: true,
 			});
