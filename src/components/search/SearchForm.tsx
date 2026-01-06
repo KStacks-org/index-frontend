@@ -347,7 +347,7 @@ export function SearchForm({
 							overlayFilters && [
 								"absolute top-full left-0 right-0 mt-2 z-50",
 								"bg-popover shadow-xl border-border",
-								"max-h-[calc(100vh-220px)] overflow-y-auto overscroll-contain scrollbar-thin",
+								"max-h-[calc(100vh-300px)] overflow-y-auto overscroll-contain scrollbar-thin",
 								"animate-in fade-in zoom-in-95",
 							],
 						)}
