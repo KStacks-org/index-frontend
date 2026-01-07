@@ -8,6 +8,7 @@ import appCss from "../styles.css?url";
 
 import type { QueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { BootGate } from "@/components/providers/BootGate";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -82,7 +83,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-					{children}
+					<BootGate>{children}</BootGate>
 				</ThemeProvider>
 				<Scripts />
 			</body>
