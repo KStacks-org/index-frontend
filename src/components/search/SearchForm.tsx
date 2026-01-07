@@ -137,15 +137,7 @@ export function SearchForm({
 			return () => clearTimeout(delayDebounceFn);
 		}
 	}, [
-		query,
-		dayFilter,
-		levelFilter,
-		instructorFilter,
-		startTimeFilter,
-		endTimeFilter,
-		sectionFilter,
-		genderFilter,
-		branchFilter,
+		query
 	]);
 
 	// --- FILTER FIELDS JSX (Reusable) ---
