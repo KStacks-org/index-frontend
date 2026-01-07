@@ -2,10 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 
 function BootLoader() {
   return (
-    <div className="fixed inset-0 z-[9999] grid place-items-center bg-black text-foreground">
+    <div 
+      className="fixed inset-0 z-[9999] grid place-items-center bg-black text-foreground"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading application">
       <div className="flex items-center gap-3">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-        <span className="text-white/80">Indexing…</span>
+        <span className="text-white/80" aria-hidden="true">Loading…</span>
       </div>
     </div>
   );
