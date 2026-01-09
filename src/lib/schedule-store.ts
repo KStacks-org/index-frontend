@@ -1,5 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { searchCourses } from "@/lib/api";
+
+let syncInFlight = false;
 
 // Your existing Course interface
 export interface Course {
@@ -45,6 +48,9 @@ interface ScheduleState {
 	// Selectors
 	getActiveCourses: () => Course[];
 	isCourseSelected: (courseId: number) => boolean;
+
+	syncActiveTabCourses: () => Promise<void>;
+
 }
 
 export const useScheduleStore = create<ScheduleState>()(
@@ -127,6 +133,57 @@ export const useScheduleStore = create<ScheduleState>()(
 				const courses = get().getActiveCourses();
 				return !!courses.find((c) => c.id === courseId);
 			},
+
+			// --- DUCT-TAPE SYNC FUNCTION ---
+			syncActiveTabCourses: async () => {
+				try {
+					const { tabs, activeTabId } = get();
+					const tab = tabs.find((t) => t.id === activeTabId);
+					if (!tab || !tab.courses?.length) return;
+
+					const termCode = (tab.courses[0] as any).termCode ?? "202602";
+
+					const crns = tab.courses
+						.map((c) => String((c as any).crn ?? ""))
+						.filter(Boolean);
+
+					if (crns.length === 0) return;
+
+					// Fetch fresh versions (one request per CRN)
+					const results = await Promise.allSettled(
+						crns.map(async (crn) => {
+							const res = await searchCourses({
+								termCode,
+								crn,
+								page: 1,
+								limit: 1,
+							} as any);
+
+							return res?.data?.[0] ?? null;
+						})
+					);
+
+					const fresh = results
+						.filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
+						.map((r) => r.value)
+						.filter(Boolean);
+
+					const freshByCrn = new Map(fresh.map((c) => [String(c.crn), c]));
+
+					const merged = tab.courses.map((oldCourse) => {
+						const crn = String((oldCourse as any).crn ?? "");
+						return freshByCrn.get(crn) ?? oldCourse;
+					});
+
+					set({
+						tabs: tabs.map((t) => (t.id === activeTabId ? { ...t, courses: merged } : t)),
+					});
+				} catch (e) {
+					console.error("syncActiveTabCourses failed:", e);
+				}
+			},
+
+
 		}),
 		{
 			name: "kau-schedule-storage",

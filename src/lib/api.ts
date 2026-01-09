@@ -66,3 +66,15 @@ export const searchCourses = async (
 	});
 	return data;
 };
+
+// Duct-tape: fetch latest course objects by CRN via the existing /search endpoint
+export async function getSectionByCrn(crn: string, termCode?: string) {
+  const params = new URLSearchParams({ crn });
+  if (termCode) params.set("termCode", termCode);
+
+  const res = await fetch(`/section?${params.toString()}`);
+  if (!res.ok) throw new Error(`Failed to fetch section ${crn}`);
+  return (await res.json()) as { status: string; data: any };
+}
+
+

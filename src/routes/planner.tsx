@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toPng } from "html-to-image";
@@ -135,6 +135,12 @@ function SchedulePage() {
 			setTabToEdit(null);
 		}
 	};
+
+	// Duct Tape FIX
+	useEffect(() => {
+		useScheduleStore.getState().syncActiveTabCourses();
+	}, [activeTabId]);
+
 
 	const checkConflict = (courseToCheck: Course): Course[] => {
 		if (selectedCourses.some((c) => c.id === courseToCheck.id)) return [];
