@@ -16,6 +16,8 @@ import {
 } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { Moon, Sun, Menu, GraduationCap, Info, Calendar } from "lucide-react";
+import { CalendarCogIcon } from "@/components/ui/calendar-cog";
+import { CircleHelpIcon } from "@/components/ui/circle-help";
 
 function ModeToggle() {
 	const { setTheme } = useTheme();
@@ -79,7 +81,8 @@ export function KauHeader() {
 							className: "text-green-600 dark:text-green-400 font-semibold",
 						}}
 					>
-						Schedule Planner
+						<CalendarCogIcon className="mr-2"/>
+						<span>Schedule Planner</span>
 					</Link>
 					<Link
 						to="/about"
@@ -88,7 +91,8 @@ export function KauHeader() {
 							className: "text-green-600 dark:text-green-400 font-semibold",
 						}}
 					>
-						About
+						<CircleHelpIcon className="mr-2"/>
+						<span>About</span>
 					</Link>
 				</div>
 
