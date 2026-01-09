@@ -7,8 +7,8 @@ import { ScheduleEvent } from "./ScheduleEvent";
 import { getCourseHue } from "@/lib/get-course-hue";
 
 export function DesktopSchedule() {
-	const getActiveCourses = useScheduleStore((state) => state.getActiveCourses);
-	const selectedCourses = getActiveCourses();
+
+	const selectedCourses = useScheduleStore((state) => state.getActiveCourses());
 
 	// DYNAMIC RANGE CALCULATION
 	const { startHour, totalHours } = useMemo(() => {

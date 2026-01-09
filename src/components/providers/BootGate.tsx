@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useScheduleStore } from "@/lib/schedule-store";
 
 function BootLoader() {
   return (
@@ -24,6 +25,9 @@ export function BootGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
+
+    // DUCT-TAPE SYNC (non-blocking, runs once on app boot)
+  useScheduleStore.getState().syncActiveTabCourses?.();
 
     let cancelled = false;
 
