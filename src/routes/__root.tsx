@@ -88,8 +88,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							children
 						) : (
 							<div className="flex items-center justify-center h-screen w-full">
-								<p className="text-black dark:text-white">
-									This website is under development, thank you for your pacince.
+								<p className="text-black dark:text-white text-center">
+									This website is under development, thank you for your
+									pacience.
 								</p>
 							</div>
 						)}
