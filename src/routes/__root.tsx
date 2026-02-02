@@ -9,7 +9,6 @@ import appCss from "../styles.css?url";
 import type { QueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { BootGate } from "@/components/providers/BootGate";
-import { Card } from "@/components/ui/card";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
