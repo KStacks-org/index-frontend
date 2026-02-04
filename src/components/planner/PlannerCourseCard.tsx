@@ -1,10 +1,10 @@
-import { Course } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
 import { useScheduleStore } from "@/lib/schedule-store";
 import { cn } from "@/lib/utils";
 import { getCourseHue } from "@/lib/get-course-hue";
+import { Course } from "@/types";
 
 interface PlannerCourseCardProps {
 	course: Course;
@@ -41,7 +41,7 @@ export function PlannerCourseCard({
 		}
 	};
 
-	const hue = getCourseHue(course.subject, course.courseCode);
+	const hue = getCourseHue(course.courseCode, course.courseNumber);
 
 	return (
 		<div
@@ -76,8 +76,8 @@ export function PlannerCourseCard({
 							variant="secondary"
 							className="text-[10px] px-1.5 h-5 font-mono bg-muted text-foreground border border-border/50"
 						>
-							{course.subject}
 							{course.courseCode}
+							{course.courseNumber}
 						</Badge>
 
 						{course.credits && (
@@ -154,7 +154,7 @@ export function PlannerCourseCard({
 							<span>
 								Conflict:{" "}
 								{conflictCourses
-									?.map((c) => c.subject + c.courseCode)
+									?.map((c) => c.courseCode + c.courseNumber)
 									.join(", ")}
 							</span>
 							<button

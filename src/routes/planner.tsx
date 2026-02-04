@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toPng } from "html-to-image";
-import { searchCourses, SearchParams } from "../lib/api";
+import { searchCourses } from "../lib/api";
 import { KauHeader } from "@/components/layout/KauHeader";
 import { ScheduleCalendar } from "@/components/planner/ScheduleCalendar";
 import { DesktopSchedule } from "@/components/planner/DesktopSchedule";
@@ -38,10 +38,11 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { Course, useScheduleStore } from "@/lib/schedule-store";
+import { useScheduleStore } from "@/lib/schedule-store";
 import { parseTimeRange } from "@/lib/schedule-utils";
 import { KauFooter } from "@/components/layout/KauFooter";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { Course, SearchParams } from "@/types";
 
 export const Route = createFileRoute("/planner")({
 	component: SchedulePage,
@@ -141,14 +142,13 @@ function SchedulePage() {
 		useScheduleStore.getState().syncActiveTabCourses();
 	}, [activeTabId]);
 
-
 	const checkConflict = (courseToCheck: Course): Course[] => {
 		if (selectedCourses.some((c) => c.id === courseToCheck.id)) return [];
 
 		const conflicts = selectedCourses.filter((selected) => {
 			if (
-				selected.subject + selected.courseCode ===
-				courseToCheck.subject + courseToCheck.courseCode
+				selected.courseCode + selected.courseNumber ===
+				courseToCheck.courseCode + courseToCheck.courseNumber
 			)
 				return true;
 

@@ -7,7 +7,6 @@ import { ScheduleEvent } from "./ScheduleEvent";
 import { getCourseHue } from "@/lib/get-course-hue";
 
 export function DesktopSchedule() {
-
 	const selectedCourses = useScheduleStore((state) => state.getActiveCourses());
 
 	// DYNAMIC RANGE CALCULATION
@@ -129,7 +128,10 @@ export function DesktopSchedule() {
 											(startMinutesFromViewStart / totalViewMinutes) * 100;
 										const heightPercent =
 											((time.end - time.start) / totalViewMinutes) * 100;
-										const hue = getCourseHue(course.subject, course.courseCode);
+										const hue = getCourseHue(
+											course.courseCode,
+											course.courseNumber,
+										);
 
 										return (
 											<ScheduleEvent

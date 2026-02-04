@@ -1,28 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { searchCourses } from "@/lib/api";
+import { Course } from "@/types";
 
 let syncInFlight = false;
-
-// Your existing Course interface
-export interface Course {
-	id: number;
-	crn: number;
-	title: string;
-	courseCode: string;
-	subject: string;
-	section: string;
-	primaryInstructor: string;
-	credits: number;
-	branch: string;
-	schedules: Array<{
-		type: string;
-		days: string;
-		time: string;
-		room: string;
-		instructor: string;
-	}>;
-}
 
 // New Interface for a Tab
 export interface ScheduleTab {
@@ -50,7 +31,6 @@ interface ScheduleState {
 	isCourseSelected: (courseId: number) => boolean;
 
 	syncActiveTabCourses: () => Promise<void>;
-
 }
 
 export const useScheduleStore = create<ScheduleState>()(
@@ -160,11 +140,13 @@ export const useScheduleStore = create<ScheduleState>()(
 							} as any);
 
 							return res?.data?.[0] ?? null;
-						})
+						}),
 					);
 
 					const fresh = results
-						.filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
+						.filter(
+							(r): r is PromiseFulfilledResult<any> => r.status === "fulfilled",
+						)
 						.map((r) => r.value)
 						.filter(Boolean);
 
@@ -176,14 +158,14 @@ export const useScheduleStore = create<ScheduleState>()(
 					});
 
 					set({
-						tabs: tabs.map((t) => (t.id === activeTabId ? { ...t, courses: merged } : t)),
+						tabs: tabs.map((t) =>
+							t.id === activeTabId ? { ...t, courses: merged } : t,
+						),
 					});
 				} catch (e) {
 					console.error("syncActiveTabCourses failed:", e);
 				}
 			},
-
-
 		}),
 		{
 			name: "kau-schedule-storage",

@@ -1,4 +1,4 @@
-import { useScheduleStore, Course } from "@/lib/schedule-store";
+import { useScheduleStore } from "@/lib/schedule-store";
 import { DAYS_HEADER, DAY_MAP, parseTimeRange } from "@/lib/schedule-utils";
 import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
 import { useState } from "react";
@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Schedule } from "@/lib/api";
 import { getCourseHue } from "@/lib/get-course-hue";
+import { Course, Schedule } from "@/types";
 
 export function MobileSchedule() {
 	const getActiveCourses = useScheduleStore((state) => state.getActiveCourses);
@@ -97,7 +97,7 @@ function MobileCourseCard({
 	schedule: Schedule;
 }) {
 	const [open, setOpen] = useState(false);
-	const hue = getCourseHue(course.subject, course.courseCode);
+	const hue = getCourseHue(course.courseCode, course.courseNumber);
 
 	return (
 		<>
@@ -113,7 +113,7 @@ function MobileCourseCard({
 				<div className="flex justify-between items-start">
 					<div>
 						<h4 className="font-bold text-foreground">
-							{course.subject} {course.courseCode}
+							{course.courseCode} {course.courseNumber}
 						</h4>
 						<p className="text-xs text-muted-foreground line-clamp-1">
 							{course.title}
@@ -147,7 +147,7 @@ function MobileCourseCard({
 						</DialogTitle>
 						<DialogDescription className="flex items-center gap-2 mt-1">
 							<Badge variant="outline">
-								{course.subject} {course.courseCode}
+								{course.courseCode} {course.courseNumber}
 							</Badge>
 							<Badge variant="secondary">{course.credits} Credits</Badge>
 						</DialogDescription>

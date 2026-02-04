@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Course, Schedule } from "@/lib/api";
 import {
 	Dialog,
 	DialogContent,
@@ -10,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, User, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Course, Schedule } from "@/types";
 
 interface ScheduleEventProps {
 	course: Course;
@@ -47,9 +47,9 @@ export function ScheduleEvent({
 				title={`${course.title} \n${schedule.time} \n${schedule.instructor}`}
 			>
 				<div className="flex w-full justify-between items-center mb-0.5">
-					<span className="font-bold text-[8px] md:text-[10px] truncate max-w-full md:max-w-[70%]">
-						{course.subject}
+					<span className="font-bold text-[8px] md:text-[10px] max-w-full md:max-w-[70%]">
 						{course.courseCode}
+						{course.courseNumber}
 					</span>
 					<span className="font-bold text-[10px] inline ml-auto">
 						{course.section}
@@ -76,7 +76,7 @@ export function ScheduleEvent({
 						</div>
 						<DialogDescription className="flex items-center gap-2 mt-1">
 							<Badge variant="outline" className="font-mono text-xs">
-								{course.subject} {course.courseCode}
+								{course.courseCode} {course.courseNumber}
 							</Badge>
 							{course.section && (
 								<Badge variant="secondary" className="text-xs">
