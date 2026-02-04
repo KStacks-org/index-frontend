@@ -16,8 +16,6 @@ import {
 } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { Moon, Sun, Menu, GraduationCap, Info, Calendar } from "lucide-react";
-import { CalendarCogIcon } from "@/components/ui/calendar-cog";
-import { CircleHelpIcon } from "@/components/ui/circle-help";
 
 function ModeToggle() {
 	const { setTheme } = useTheme();
@@ -69,11 +67,8 @@ export function KauHeader() {
 
 			{/* --- RIGHT SIDE: Actions --- */}
 			<nav className="flex items-center gap-3">
-				{/* 1. Theme Toggle (Visible on all screens) */}
-				<ModeToggle />
-
-				{/* 2. DESKTOP LINKS (Hidden on mobile) */}
-				<div className="hidden md:flex items-center gap-6 ml-2">
+				{/* DESKTOP LINKS (Hidden on mobile) */}
+				<div className="hidden md:flex items-center gap-6 mr-2">
 					<Link
 						to="/planner"
 						className="flex items-center font-medium text-sm text-muted-foreground hover:text-green-600 dark:hover:text-green-400 transition-colors"
@@ -81,7 +76,6 @@ export function KauHeader() {
 							className: "text-green-600 dark:text-green-400 font-semibold",
 						}}
 					>
-						<CalendarCogIcon className="mr-2"/>
 						<span>Schedule Planner</span>
 					</Link>
 					<Link
@@ -91,12 +85,14 @@ export function KauHeader() {
 							className: "text-green-600 dark:text-green-400 font-semibold",
 						}}
 					>
-						<CircleHelpIcon className="mr-2"/>
 						<span>About</span>
 					</Link>
 				</div>
 
-				{/* 3. MOBILE MENU (Visible only on mobile) */}
+				{/* Theme Toggle (Visible on all screens) */}
+				<ModeToggle />
+
+				{/* MOBILE MENU (Visible only on mobile) */}
 				<div className="md:hidden">
 					<Sheet open={open} onOpenChange={setOpen}>
 						<SheetTrigger asChild>
