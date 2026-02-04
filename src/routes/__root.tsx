@@ -90,7 +90,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							<div className="flex items-center justify-center h-screen w-full">
 								<p className="text-black dark:text-white text-center">
 									This website is under development, thank you for your
-									pacience.
+									patience.
 								</p>
 							</div>
 						)}
