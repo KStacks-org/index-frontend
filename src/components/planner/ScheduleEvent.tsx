@@ -7,9 +7,10 @@ import {
 	DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, User, BookOpen } from "lucide-react";
+import { Clock, MapPin, User, BookOpen, Moon } from "lucide-react"; // Added Moon
 import { cn } from "@/lib/utils";
 import { Course, Schedule } from "@/types";
+import { useRamadanTime } from "@/hooks/use-ramadan-time"; // Import your hook
 
 interface ScheduleEventProps {
 	course: Course;
@@ -25,6 +26,10 @@ export function ScheduleEvent({
 	hue,
 }: ScheduleEventProps) {
 	const [open, setOpen] = useState(false);
+	const { isRamadanMode, formatRamadanTime } = useRamadanTime();
+
+	// Calculate the display time once
+	const displayTime = formatRamadanTime(schedule.time);
 
 	return (
 		<>
@@ -44,7 +49,7 @@ export function ScheduleEvent({
 					"border-[hsla(var(--course-hue),70%,45%,0.3)] dark:border-[hsla(var(--course-hue),70%,60%,0.3)]",
 					"text-[hsl(var(--course-hue),80%,35%)] dark:text-[hsl(var(--course-hue),85%,80%)]",
 				)}
-				title={`${course.title} \n${schedule.time} \n${schedule.instructor}`}
+				title={`${course.title} \n${displayTime} \n${schedule.instructor}`}
 			>
 				<div className="flex w-full justify-between items-center mb-0.5">
 					<span className="font-bold text-[8px] md:text-[10px] max-w-full md:max-w-[70%]">
@@ -56,12 +61,16 @@ export function ScheduleEvent({
 					</span>
 				</div>
 
-				<div className="block truncate opacity-90 text-[9px]">
-					{schedule.instructor}
-				</div>
+				<div className="block opacity-90 text-[9px]">{schedule.instructor}</div>
 
-				<div className="block truncate opacity-75 text-[8px] mt-0.5">
-					{schedule.time}
+				<div
+					className={cn(
+						"opacity-75 text-[8px] mt-0.5 flex items-center gap-0.5",
+						isRamadanMode && "font-semibold",
+					)}
+				>
+					{isRamadanMode && <Moon className="h-2 w-2 shrink-0" />}
+					<span>{displayTime}</span>
 				</div>
 			</div>
 
@@ -74,7 +83,7 @@ export function ScheduleEvent({
 								{course.title}
 							</DialogTitle>
 						</div>
-						<DialogDescription className="flex items-center gap-2 mt-1">
+						<DialogDescription className="flex flex-wrap items-center gap-2 mt-1">
 							<Badge variant="outline" className="font-mono text-xs">
 								{course.courseCode} {course.courseNumber}
 							</Badge>
@@ -86,6 +95,11 @@ export function ScheduleEvent({
 							<Badge variant="secondary" className="text-xs">
 								{course.credits} Credits
 							</Badge>
+							{isRamadanMode && (
+								<Badge className="bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 gap-1 text-xs">
+									<Moon className="h-3 w-3" /> Ramadan Timing
+								</Badge>
+							)}
 						</DialogDescription>
 					</DialogHeader>
 
@@ -106,8 +120,15 @@ export function ScheduleEvent({
 							<Clock className="h-5 w-5 text-muted-foreground mt-0.5" />
 							<div className="grid gap-0.5">
 								<span className="font-medium text-sm">Time & Days</span>
-								<span className="text-sm text-muted-foreground">
-									{schedule.time} ({schedule.days})
+								<span
+									className={cn(
+										"text-sm",
+										isRamadanMode
+											? "text-amber-600 dark:text-amber-400 font-medium"
+											: "text-muted-foreground",
+									)}
+								>
+									{displayTime} ({schedule.days})
 								</span>
 							</div>
 						</div>

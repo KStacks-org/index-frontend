@@ -1,7 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Moon } from "lucide-react";
 import { useScheduleStore } from "@/lib/schedule-store";
+import { useRamadanTime } from "@/hooks/use-ramadan-time";
 import { cn } from "@/lib/utils";
 import { getCourseHue } from "@/lib/get-course-hue";
 import { Course } from "@/types";
@@ -20,6 +21,8 @@ export function PlannerCourseCard({
 	noOutline = false,
 }: PlannerCourseCardProps) {
 	const { addCourse, removeCourse, isCourseSelected } = useScheduleStore();
+	const { isRamadanMode, formatRamadanTime } = useRamadanTime();
+
 	const selected = isCourseSelected(course.id);
 
 	const handleToggle = (e: React.MouseEvent) => {
@@ -64,7 +67,6 @@ export function PlannerCourseCard({
 		>
 			<div className="p-3 flex items-start gap-3">
 				<div className="flex-1 min-w-0">
-					{/* Header Row: Code, CRN, Section */}
 					<div className="flex flex-wrap items-center gap-2 mb-1.5">
 						<div
 							className="w-4 h-4 shadow-sm"
@@ -96,7 +98,6 @@ export function PlannerCourseCard({
 							{course.crn}
 						</span>
 
-						{/* Action Button */}
 						<Button
 							size="icon"
 							variant={selected ? "destructive" : "secondary"}
@@ -115,7 +116,6 @@ export function PlannerCourseCard({
 						</Button>
 					</div>
 
-					{/* Title */}
 					<h4
 						className={cn(
 							"font-bold text-sm leading-tight mb-2 line-clamp-2",
@@ -125,7 +125,6 @@ export function PlannerCourseCard({
 						{course.title}
 					</h4>
 
-					{/* Schedule & Instructor */}
 					<div className="space-y-2">
 						{course.schedules.map((s, i) => (
 							<div
@@ -136,7 +135,16 @@ export function PlannerCourseCard({
 									<span className="font-semibold text-foreground w-5">
 										{s.days}
 									</span>
-									<span className="opacity-80">{s.time}</span>
+									<span
+										className={cn(
+											"opacity-80 flex items-center gap-1",
+											isRamadanMode &&
+												"text-amber-600 dark:text-amber-400 font-medium",
+										)}
+									>
+										{isRamadanMode && <Moon className="h-2.5 w-2.5" />}
+										{formatRamadanTime(s.time)}
+									</span>
 								</div>
 								<div
 									className="truncate opacity-80 max-w-45"
@@ -148,13 +156,12 @@ export function PlannerCourseCard({
 						))}
 					</div>
 
-					{/* Conflict Warning Overlay */}
-					{(conflictCourses?.length ?? 0) > 0 && !selected && (
+					{conflictCourses && conflictCourses.length > 0 && !selected && (
 						<div className="mt-2 w-full text-[10px] text-destructive flex items-center gap-1 font-medium bg-destructive/5 p-1">
 							<span>
 								Conflict:{" "}
 								{conflictCourses
-									?.map((c) => c.courseCode + c.courseNumber)
+									.map((c) => c.courseCode + c.courseNumber)
 									.join(", ")}
 							</span>
 							<button

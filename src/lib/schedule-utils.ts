@@ -1,5 +1,3 @@
-// src/lib/schedule-utils.ts
-
 export const DAY_MAP: Record<string, number> = {
 	U: 0, // Sunday
 	M: 1, // Monday

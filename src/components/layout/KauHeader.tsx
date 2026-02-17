@@ -16,6 +16,7 @@ import {
 } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { Moon, Sun, Menu, GraduationCap, Info, Calendar } from "lucide-react";
+import { RamadanToggle } from "./RamadanToggle";
 
 function ModeToggle() {
 	const { setTheme } = useTheme();
@@ -91,6 +92,7 @@ export function KauHeader() {
 
 				{/* Theme Toggle (Visible on all screens) */}
 				<ModeToggle />
+				<RamadanToggle />
 
 				{/* MOBILE MENU (Visible only on mobile) */}
 				<div className="md:hidden">
