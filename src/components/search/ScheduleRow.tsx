@@ -1,5 +1,6 @@
-import { Schedule } from "@/lib/api";
-import { Clock, MapPin, User } from "lucide-react";
+import { useRamadanTime } from "@/hooks/use-ramadan-time";
+import { Schedule } from "@/types";
+import { Clock, MapPin, Moon, User } from "lucide-react";
 
 export function ScheduleRow({
 	schedule,
@@ -9,6 +10,8 @@ export function ScheduleRow({
 }) {
 	const isDayActive = (dayChar: string) =>
 		schedule.days && schedule.days.includes(dayChar);
+
+	const { isRamadanMode, formatRamadanTime } = useRamadanTime();
 
 	return (
 		<div className="flex flex-col gap-3 p-3 bg-card border border-border transition-all group text-center">
@@ -34,8 +37,16 @@ export function ScheduleRow({
 				</div>
 				{/* 2. Time LARGE */}
 				<div className="hidden sm:flex items-center gap-1.5 text-foreground font-medium text-sm whitespace-nowrap">
-					<Clock className="h-3.5 w-3.5 text-primary" />
-					<span>{schedule.time || "TBA"}</span>
+					{isRamadanMode ? (
+						<Moon className="h-3.5 w-3.5 text-primary" />
+					) : (
+						<Clock className="h-3.5 w-3.5 text-primary" />
+					)}{" "}
+					<span>
+						{isRamadanMode
+							? formatRamadanTime(schedule.time)
+							: schedule.time || "TBA"}
+					</span>
 				</div>
 			</div>
 
