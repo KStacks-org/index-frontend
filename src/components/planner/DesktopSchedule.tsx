@@ -176,7 +176,7 @@ export function DesktopSchedule() {
 				</div>
 
 				{/* SEQUENTIAL COLUMNS BODY */}
-				<div className="flex-1 flex bg-muted/5">
+				<div className="flex-1 flex bg-muted/5 overflow-auto">
 					{/* Left gutter padding */}
 					<div className="w-12 border-r border-border shrink-0 bg-background/50"></div>
 
