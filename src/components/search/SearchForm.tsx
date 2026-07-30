@@ -60,7 +60,7 @@ export function SearchForm({
   }, [filtersOpen, layout, overlayFilters]);
 
   // --- STATE ---
-  const [termCode, setTermCode] = useState(initialValues?.termCode || "202602");
+  const [termCode, setTermCode] = useState(initialValues?.termCode || "202701");
   const [query, setQuery] = useState(initialValues?.q || "");
   const [dayFilter, setDayFilter] = useState(initialValues?.days || "");
   const [levelFilter, setLevelFilter] = useState(initialValues?.level || "");
