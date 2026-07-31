@@ -14,29 +14,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import {
-	Loader2,
-	ChevronLeft,
-	ChevronRight,
-	Plus,
-	BookOpen,
-	Search as SearchIcon,
-	Download,
-	X,
-	Edit,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  BookOpen,
+  Search as SearchIcon,
+  Download,
+  X,
+  Edit,
 } from "lucide-react";
 import {
-	Sheet,
-	SheetContent,
-	SheetHeader,
-	SheetTitle,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useScheduleStore } from "@/lib/schedule-store";
 import { parseTimeRange } from "@/lib/schedule-utils";
@@ -45,492 +45,492 @@ import { useTheme } from "@/components/providers/ThemeProvider";
 import { Course, SearchParams } from "@/types";
 
 export const Route = createFileRoute("/planner")({
-	component: SchedulePage,
+  component: SchedulePage,
 });
 
 function SchedulePage() {
-	// --- Store Hooks ---
-	const {
-		tabs,
-		activeTabId,
-		setActiveTab,
-		addTab,
-		removeTab,
-		renameTab,
-		getActiveCourses,
-	} = useScheduleStore();
+  // --- Store Hooks ---
+  const {
+    tabs,
+    activeTabId,
+    setActiveTab,
+    addTab,
+    removeTab,
+    renameTab,
+    getActiveCourses,
+  } = useScheduleStore();
 
-	const selectedCourses = getActiveCourses();
-	const calendarRef = useRef<HTMLDivElement>(null);
-	const downloadRef = useRef<HTMLDivElement>(null);
+  const selectedCourses = getActiveCourses();
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const downloadRef = useRef<HTMLDivElement>(null);
 
-	// --- UI State ---
-	const [sidebarMode, setSidebarMode] = useState<"view" | "search">("view");
-	const [isSheetOpen, setIsSheetOpen] = useState(false);
-	const [isDownloading, setIsDownloading] = useState(false);
+  // --- UI State ---
+  const [sidebarMode, setSidebarMode] = useState<"view" | "search">("view");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-	// --- Dialog State ---
-	const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	const [tabToEdit, setTabToEdit] = useState<{
-		id: string;
-		name: string;
-	} | null>(null);
-	const [newName, setNewName] = useState("");
+  // --- Dialog State ---
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [tabToEdit, setTabToEdit] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [newName, setNewName] = useState("");
 
-	const { theme } = useTheme();
-	const isDark =
-		theme === "dark" ||
-		(theme === "system" &&
-			window.matchMedia("(prefers-color-scheme: dark)").matches);
-	// --- Search State ---
-	const [localFilters, setLocalFilters] = useState<Partial<SearchParams>>({
-		termCode: "202602",
-		page: 1,
-		limit: 10,
-	});
+  const { theme } = useTheme();
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  // --- Search State ---
+  const [localFilters, setLocalFilters] = useState<Partial<SearchParams>>({
+    termCode: "202701",
+    page: 1,
+    limit: 10,
+  });
 
-	const { data, isLoading } = useQuery({
-		queryKey: ["mini-search", localFilters],
-		queryFn: () => searchCourses(localFilters as SearchParams),
-		enabled: sidebarMode === "search" && isSheetOpen,
-		placeholderData: (prev) => prev,
-	});
+  const { data, isLoading } = useQuery({
+    queryKey: ["mini-search", localFilters],
+    queryFn: () => searchCourses(localFilters as SearchParams),
+    enabled: sidebarMode === "search" && isSheetOpen,
+    placeholderData: (prev) => prev,
+  });
 
-	// --- Handlers ---
-	const handleLocalSearch = (newFilters: any) => {
-		setLocalFilters((prev) => ({ ...prev, ...newFilters, page: 1 }));
-	};
+  // --- Handlers ---
+  const handleLocalSearch = (newFilters: any) => {
+    setLocalFilters((prev) => ({ ...prev, ...newFilters, page: 1 }));
+  };
 
-	const handlePageChange = (newPage: number) => {
-		setLocalFilters((prev) => ({ ...prev, page: newPage }));
-	};
+  const handlePageChange = (newPage: number) => {
+    setLocalFilters((prev) => ({ ...prev, page: newPage }));
+  };
 
-	// Dialog: Open Rename
-	const openRenameDialog = (id: string, currentName: string) => {
-		setTabToEdit({ id, name: currentName });
-		setNewName(currentName);
-		setRenameDialogOpen(true);
-	};
+  // Dialog: Open Rename
+  const openRenameDialog = (id: string, currentName: string) => {
+    setTabToEdit({ id, name: currentName });
+    setNewName(currentName);
+    setRenameDialogOpen(true);
+  };
 
-	// Dialog: Confirm Rename
-	const confirmRename = () => {
-		if (tabToEdit && newName.trim()) {
-			renameTab(tabToEdit.id, newName.trim());
-			setRenameDialogOpen(false);
-			setTabToEdit(null);
-		}
-	};
+  // Dialog: Confirm Rename
+  const confirmRename = () => {
+    if (tabToEdit && newName.trim()) {
+      renameTab(tabToEdit.id, newName.trim());
+      setRenameDialogOpen(false);
+      setTabToEdit(null);
+    }
+  };
 
-	// Dialog: Open Delete
-	const openDeleteDialog = (id: string, name: string) => {
-		setTabToEdit({ id, name });
-		setDeleteDialogOpen(true);
-	};
+  // Dialog: Open Delete
+  const openDeleteDialog = (id: string, name: string) => {
+    setTabToEdit({ id, name });
+    setDeleteDialogOpen(true);
+  };
 
-	// Dialog: Confirm Delete
-	const confirmDelete = () => {
-		if (tabToEdit) {
-			removeTab(tabToEdit.id);
-			setDeleteDialogOpen(false);
-			setTabToEdit(null);
-		}
-	};
+  // Dialog: Confirm Delete
+  const confirmDelete = () => {
+    if (tabToEdit) {
+      removeTab(tabToEdit.id);
+      setDeleteDialogOpen(false);
+      setTabToEdit(null);
+    }
+  };
 
-	// Duct Tape FIX
-	useEffect(() => {
-		useScheduleStore.getState().syncActiveTabCourses();
-	}, [activeTabId]);
+  // Duct Tape FIX
+  useEffect(() => {
+    useScheduleStore.getState().syncActiveTabCourses();
+  }, [activeTabId]);
 
-	const checkConflict = (courseToCheck: Course): Course[] => {
-		if (selectedCourses.some((c) => c.id === courseToCheck.id)) return [];
+  const checkConflict = (courseToCheck: Course): Course[] => {
+    if (selectedCourses.some((c) => c.id === courseToCheck.id)) return [];
 
-		const conflicts = selectedCourses.filter((selected) => {
-			if (
-				selected.courseCode + selected.courseNumber ===
-				courseToCheck.courseCode + courseToCheck.courseNumber
-			)
-				return true;
+    const conflicts = selectedCourses.filter((selected) => {
+      if (
+        selected.courseCode + selected.courseNumber ===
+        courseToCheck.courseCode + courseToCheck.courseNumber
+      )
+        return true;
 
-			return selected.schedules.some((selSched) => {
-				return courseToCheck.schedules.some((checkSched) => {
-					const selDays = selSched.days.split("");
-					const checkDays = checkSched.days.split("");
-					if (!selDays.some((d) => checkDays.includes(d))) return false;
+      return selected.schedules.some((selSched) => {
+        return courseToCheck.schedules.some((checkSched) => {
+          const selDays = selSched.days.split("");
+          const checkDays = checkSched.days.split("");
+          if (!selDays.some((d) => checkDays.includes(d))) return false;
 
-					const selTime = parseTimeRange(selSched.time);
-					const checkTime = parseTimeRange(checkSched.time);
+          const selTime = parseTimeRange(selSched.time);
+          const checkTime = parseTimeRange(checkSched.time);
 
-					if (!selTime || !checkTime) return false;
-					return selTime.start < checkTime.end && selTime.end > checkTime.start;
-				});
-			});
-		});
+          if (!selTime || !checkTime) return false;
+          return selTime.start < checkTime.end && selTime.end > checkTime.start;
+        });
+      });
+    });
 
-		return conflicts;
-	};
+    return conflicts;
+  };
 
-	const openSidebar = (mode: "view" | "search") => {
-		setSidebarMode(mode);
-		setIsSheetOpen(true);
-	};
+  const openSidebar = (mode: "view" | "search") => {
+    setSidebarMode(mode);
+    setIsSheetOpen(true);
+  };
 
-	const handleDownload = async () => {
-		if (!downloadRef.current) return;
-		try {
-			setIsDownloading(true);
-			const element = downloadRef.current;
-			// Let html-to-image capture the element as-is (at full desktop width)
-			const dataUrl = await toPng(element, {
-				cacheBust: true,
-				backgroundColor: isDark ? "#0a0a0a" : "#ffffff",
-				pixelRatio: 2,
-				skipFonts: true,
-			});
+  const handleDownload = async () => {
+    if (!downloadRef.current) return;
+    try {
+      setIsDownloading(true);
+      const element = downloadRef.current;
+      // Let html-to-image capture the element as-is (at full desktop width)
+      const dataUrl = await toPng(element, {
+        cacheBust: true,
+        backgroundColor: isDark ? "#0a0a0a" : "#ffffff",
+        pixelRatio: 2,
+        skipFonts: true,
+      });
 
-			const link = document.createElement("a");
-			link.download =
-				(tabs.find((t) => t.id === activeTabId)?.name || "schedule") + ".png";
-			link.href = dataUrl;
-			link.click();
-		} catch (error) {
-			console.error("Failed to download schedule:", error);
-		} finally {
-			setIsDownloading(false);
-		}
-	};
+      const link = document.createElement("a");
+      link.download =
+        (tabs.find((t) => t.id === activeTabId)?.name || "schedule") + ".png";
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error("Failed to download schedule:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
-	return (
-		<div className="h-screen flex flex-col bg-background font-sans overflow-hidden">
-			<KauHeader />
+  return (
+    <div className="h-screen flex flex-col bg-background font-sans overflow-hidden">
+      <KauHeader />
 
-			{/* Main App Content: z-index 10 keeps it ABOVE the hidden download view */}
-			<div className="flex flex-1 md:flex overflow-hidden relative z-10 bg-background">
-				<main className="flex-1 p-2 md:p-4 overflow-hidden w-full flex flex-col">
-					<div className="max-w-7xl w-full mx-auto h-full flex flex-col">
-						{/* --- TOP BAR (Actions & Tabs) --- */}
-						<div className="flex flex-col gap-3 shrink-0">
-							<div className="flex justify-between items-center px-1">
-								<div className="flex items-center gap-3">
-									<h1 className="text-xl md:text-2xl font-bold">Planner</h1>
-									<Button
-										variant="outline"
-										size="icon"
-										className="h-8 w-8"
-										onClick={handleDownload}
-										disabled={isDownloading || selectedCourses.length === 0}
-										title="Download Image"
-									>
-										{isDownloading ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
-										) : (
-											<Download className="h-4 w-4" />
-										)}
-									</Button>
-								</div>
+      {/* Main App Content: z-index 10 keeps it ABOVE the hidden download view */}
+      <div className="flex flex-1 md:flex overflow-hidden relative z-10 bg-background">
+        <main className="flex-1 p-2 md:p-4 overflow-hidden w-full flex flex-col">
+          <div className="max-w-7xl w-full mx-auto h-full flex flex-col">
+            {/* --- TOP BAR (Actions & Tabs) --- */}
+            <div className="flex flex-col gap-3 shrink-0">
+              <div className="flex justify-between items-center px-1">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-xl md:text-2xl font-bold">Planner</h1>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={handleDownload}
+                    disabled={isDownloading || selectedCourses.length === 0}
+                    title="Download Image"
+                  >
+                    {isDownloading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
 
-								<div className="flex gap-2">
-									<Button
-										variant="outline"
-										size="sm"
-										className="gap-2 h-8 md:h-9"
-										onClick={() => openSidebar("view")}
-									>
-										<BookOpen className="h-4 w-4" />
-										<span className="hidden sm:inline">My Courses</span>
-										<Badge
-											variant="secondary"
-											className="ml-1 h-5 px-1.5 min-w-5 justify-center"
-										>
-											{selectedCourses.length}
-										</Badge>
-									</Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-8 md:h-9"
+                    onClick={() => openSidebar("view")}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span className="hidden sm:inline">My Courses</span>
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 h-5 px-1.5 min-w-5 justify-center"
+                    >
+                      {selectedCourses.length}
+                    </Badge>
+                  </Button>
 
-									<Button
-										size="sm"
-										className="gap-2 shadow-sm h-8 md:h-9"
-										onClick={() => openSidebar("search")}
-									>
-										<Plus className="h-4 w-4" />
-										<span className="hidden sm:inline">Add Course</span>
-										<span className="sm:hidden">Add</span>
-									</Button>
-								</div>
-							</div>
+                  <Button
+                    size="sm"
+                    className="gap-2 shadow-sm h-8 md:h-9"
+                    onClick={() => openSidebar("search")}
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden sm:inline">Add Course</span>
+                    <span className="sm:hidden">Add</span>
+                  </Button>
+                </div>
+              </div>
 
-							{/* Row 2: Tabs */}
-							<div className="flex items-center gap-1 px-1 overflow-x-auto no-scrollbar relative z-20">
-								{" "}
-								{tabs.map((tab) => (
-									<div
-										key={tab.id}
-										onClick={() => setActiveTab(tab.id)}
-										className={cn(
-											"group flex items-center gap-2 px-3 md:px-4 py-2 border-t border-x cursor-pointer text-xs md:text-sm font-medium transition-all select-none relative top-px whitespace-nowrap",
-											activeTabId === tab.id
-												? "bg-background border-border text-foreground z-10"
-												: "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
-										)}
-									>
-										<span className="max-w-20 md:max-w-none truncate">
-											{tab.name}
-										</span>
-										<span
-											className={cn(
-												"flex items-center justify-center text-[9px] h-4 min-w-4 px-1",
-												activeTabId === tab.id
-													? "bg-primary/10 text-primary"
-													: "bg-black/5 dark:bg-white/10",
-											)}
-										>
-											{tab.courses.length}
-										</span>
-										{activeTabId === tab.id && (
-											<div className="flex items-center gap-0.5 ml-1 border-l pl-1 border-border/40">
-												<button
-													onClick={(e) => {
-														e.stopPropagation();
-														openRenameDialog(tab.id, tab.name);
-													}}
-													className="hover:text-primary transition-colors p-1 hover:bg-muted"
-												>
-													<Edit className="h-3 w-3" />
-												</button>
-												<button
-													onClick={(e) => {
-														e.stopPropagation();
-														openDeleteDialog(tab.id, tab.name);
-													}}
-													disabled={tabs.length <= 1}
-													className="hover:text-destructive transition-colors disabled:opacity-30 p-1 hover:bg-destructive/10"
-												>
-													<X className="h-3 w-3" />
-												</button>
-											</div>
-										)}
-									</div>
-								))}
-								<button
-									onClick={() => addTab(`Schedule ${tabs.length + 1}`)}
-									disabled={tabs.length >= 5}
-									className="ml-1 p-1.5 hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-								>
-									<Plus className="h-4 w-4" />
-								</button>
-							</div>
-						</div>
+              {/* Row 2: Tabs */}
+              <div className="flex items-center gap-1 px-1 overflow-x-auto no-scrollbar relative z-20">
+                {" "}
+                {tabs.map((tab) => (
+                  <div
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "group flex items-center gap-2 px-3 md:px-4 py-2 border-t border-x cursor-pointer text-xs md:text-sm font-medium transition-all select-none relative top-px whitespace-nowrap",
+                      activeTabId === tab.id
+                        ? "bg-background border-border text-foreground z-10"
+                        : "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                  >
+                    <span className="max-w-20 md:max-w-none truncate">
+                      {tab.name}
+                    </span>
+                    <span
+                      className={cn(
+                        "flex items-center justify-center text-[9px] h-4 min-w-4 px-1",
+                        activeTabId === tab.id
+                          ? "bg-primary/10 text-primary"
+                          : "bg-black/5 dark:bg-white/10",
+                      )}
+                    >
+                      {tab.courses.length}
+                    </span>
+                    {activeTabId === tab.id && (
+                      <div className="flex items-center gap-0.5 ml-1 border-l pl-1 border-border/40">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openRenameDialog(tab.id, tab.name);
+                          }}
+                          className="hover:text-primary transition-colors p-1 hover:bg-muted"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteDialog(tab.id, tab.name);
+                          }}
+                          disabled={tabs.length <= 1}
+                          className="hover:text-destructive transition-colors disabled:opacity-30 p-1 hover:bg-destructive/10"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => addTab(`Schedule ${tabs.length + 1}`)}
+                  disabled={tabs.length >= 5}
+                  className="ml-1 p-1.5 hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
 
-						{/* --- RESPONSIVE CALENDAR AREA --- */}
-						<div className="flex-1 bg-background border shadow-sm overflow-hidden flex flex-col min-h-0 z-0 relative">
-							<div className="flex-1 overflow-auto bg-muted/5">
-								<div className="min-w-fit h-full p-2 md:p-0" ref={calendarRef}>
-									<ScheduleCalendar />
-								</div>
-							</div>
-						</div>
-					</div>
-				</main>
+            {/* --- RESPONSIVE CALENDAR AREA --- */}
+            <div className="flex-1 bg-background border shadow-sm overflow-hidden flex flex-col min-h-0 z-0 relative">
+              <div className="flex-1 overflow-auto bg-muted/5">
+                <div className="min-w-fit h-full p-2 md:p-0" ref={calendarRef}>
+                  <ScheduleCalendar />
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
 
-				<Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-					<SheetContent
-						side="right"
-						className="w-screen sm:w-135 p-0 flex flex-col h-full bg-card"
-					>
-						<SheetHeader className="p-4 border-b shrink-0 flex flex-row items-center justify-between space-y-0">
-							<SheetTitle className="flex items-center gap-2 text-lg">
-								{sidebarMode === "search" ? (
-									<>
-										<SearchIcon className="h-5 w-5 text-muted-foreground" />{" "}
-										Find Courses
-									</>
-								) : (
-									<>
-										<BookOpen className="h-5 w-5 text-muted-foreground" /> My
-										Courses
-									</>
-								)}
-							</SheetTitle>
-						</SheetHeader>
-						<div className="flex-1 overflow-y-auto bg-muted/5 relative">
-							{sidebarMode === "search" && (
-								<div className="flex flex-col min-h-full">
-									<div className="p-4 border-b bg-background sticky top-0 z-20 shadow-sm">
-										<SearchForm
-											initialValues={localFilters}
-											isLoading={isLoading}
-											layout="sidebar"
-											overlayFilters={true}
-											dropDown={true}
-											onSearch={handleLocalSearch}
-										/>
-									</div>
-									<div className="flex-1 p-4 space-y-3">
-										{isLoading && (
-											<div className="flex justify-center py-10">
-												<Loader2 className="h-8 w-8 animate-spin text-primary/50" />
-											</div>
-										)}
-										{!isLoading && data?.data?.length === 0 && (
-											<div className="text-center py-20 text-muted-foreground text-sm">
-												No courses found matching your filters.
-											</div>
-										)}
-										{data?.data?.map((course) => (
-											<PlannerCourseCard
-												key={course.id}
-												course={course}
-												conflict={checkConflict(course).length > 0}
-												conflictCourse={checkConflict(course)}
-											/>
-										))}
-									</div>
-									{data && data.meta.totalPages > 1 && (
-										<div className="p-3 border-t bg-background flex items-center justify-between text-xs sticky bottom-0 z-20">
-											<span className="text-muted-foreground">
-												Page {data.meta.page} of {data.meta.totalPages}
-											</span>
-											<div className="flex gap-2">
-												<Button
-													variant="outline"
-													size="icon"
-													className="h-8 w-8"
-													disabled={data.meta.page <= 1}
-													onClick={() => handlePageChange(data.meta.page - 1)}
-												>
-													<ChevronLeft className="h-3 w-3" />
-												</Button>
-												<Button
-													variant="outline"
-													size="icon"
-													className="h-8 w-8"
-													disabled={data.meta.page >= data.meta.totalPages}
-													onClick={() => handlePageChange(data.meta.page + 1)}
-												>
-													<ChevronRight className="h-3 w-3" />
-												</Button>
-											</div>
-										</div>
-									)}
-								</div>
-							)}
-							{sidebarMode === "view" && (
-								<div className="p-4 space-y-3">
-									{selectedCourses.length === 0 ? (
-										<div className="text-center py-24 flex flex-col items-center text-muted-foreground">
-											<div className="bg-muted p-4 mb-3 opacity-50">
-												<Plus className="h-6 w-6" />
-											</div>
-											<p className="font-medium">Your schedule is empty</p>
-											<Button
-												variant="link"
-												onClick={() => setSidebarMode("search")}
-												className="text-primary mt-1"
-											>
-												Click to find courses
-											</Button>
-										</div>
-									) : (
-										selectedCourses.map((course) => (
-											<PlannerCourseCard
-												noOutline
-												key={course.id}
-												course={course}
-											/>
-										))
-									)}
-								</div>
-							)}
-						</div>
-					</SheetContent>
-				</Sheet>
-			</div>
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetContent
+            side="right"
+            className="w-screen sm:w-135 p-0 flex flex-col h-full bg-card"
+          >
+            <SheetHeader className="p-4 border-b shrink-0 flex flex-row items-center justify-between space-y-0">
+              <SheetTitle className="flex items-center gap-2 text-lg">
+                {sidebarMode === "search" ? (
+                  <>
+                    <SearchIcon className="h-5 w-5 text-muted-foreground" />{" "}
+                    Find Courses
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="h-5 w-5 text-muted-foreground" /> My
+                    Courses
+                  </>
+                )}
+              </SheetTitle>
+            </SheetHeader>
+            <div className="flex-1 overflow-y-auto bg-muted/5 relative">
+              {sidebarMode === "search" && (
+                <div className="flex flex-col min-h-full">
+                  <div className="p-4 border-b bg-background sticky top-0 z-20 shadow-sm">
+                    <SearchForm
+                      initialValues={localFilters}
+                      isLoading={isLoading}
+                      layout="sidebar"
+                      overlayFilters={true}
+                      dropDown={true}
+                      onSearch={handleLocalSearch}
+                    />
+                  </div>
+                  <div className="flex-1 p-4 space-y-3">
+                    {isLoading && (
+                      <div className="flex justify-center py-10">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+                      </div>
+                    )}
+                    {!isLoading && data?.data?.length === 0 && (
+                      <div className="text-center py-20 text-muted-foreground text-sm">
+                        No courses found matching your filters.
+                      </div>
+                    )}
+                    {data?.data?.map((course) => (
+                      <PlannerCourseCard
+                        key={course.id}
+                        course={course}
+                        conflict={checkConflict(course).length > 0}
+                        conflictCourse={checkConflict(course)}
+                      />
+                    ))}
+                  </div>
+                  {data && data.meta.totalPages > 1 && (
+                    <div className="p-3 border-t bg-background flex items-center justify-between text-xs sticky bottom-0 z-20">
+                      <span className="text-muted-foreground">
+                        Page {data.meta.page} of {data.meta.totalPages}
+                      </span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          disabled={data.meta.page <= 1}
+                          onClick={() => handlePageChange(data.meta.page - 1)}
+                        >
+                          <ChevronLeft className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          disabled={data.meta.page >= data.meta.totalPages}
+                          onClick={() => handlePageChange(data.meta.page + 1)}
+                        >
+                          <ChevronRight className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {sidebarMode === "view" && (
+                <div className="p-4 space-y-3">
+                  {selectedCourses.length === 0 ? (
+                    <div className="text-center py-24 flex flex-col items-center text-muted-foreground">
+                      <div className="bg-muted p-4 mb-3 opacity-50">
+                        <Plus className="h-6 w-6" />
+                      </div>
+                      <p className="font-medium">Your schedule is empty</p>
+                      <Button
+                        variant="link"
+                        onClick={() => setSidebarMode("search")}
+                        className="text-primary mt-1"
+                      >
+                        Click to find courses
+                      </Button>
+                    </div>
+                  ) : (
+                    selectedCourses.map((course) => (
+                      <PlannerCourseCard
+                        noOutline
+                        key={course.id}
+                        course={course}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
 
-			{/* --- HIDDEN DESKTOP CALENDAR FOR DOWNLOAD --- */}
-			<div
-				ref={downloadRef}
-				style={{
-					position: "fixed",
-					left: 0,
-					top: 0,
-					width: "1500px", // Force desktop width
-					height: "1200px",
-					zIndex: -50,
-					visibility: "visible",
-				}}
-				className="bg-background p-8 flex flex-col pointer-events-none"
-			>
-				<div className="mb-6 px-2">
-					<h1 className="text-3xl font-bold">
-						{tabs.find((t) => t.id === activeTabId)?.name || "Schedule"}
-					</h1>
-					<p className="text-muted-foreground text-lg mt-1">
-						{selectedCourses.length} Courses
-					</p>
-				</div>
-				<div className="flex-1 border overflow-hidden shadow-sm">
-					<DesktopSchedule />
-				</div>
-			</div>
+      {/* --- HIDDEN DESKTOP CALENDAR FOR DOWNLOAD --- */}
+      <div
+        ref={downloadRef}
+        style={{
+          position: "fixed",
+          left: 0,
+          top: 0,
+          width: "1500px", // Force desktop width
+          height: "1200px",
+          zIndex: -50,
+          visibility: "visible",
+        }}
+        className="bg-background p-8 flex flex-col pointer-events-none"
+      >
+        <div className="mb-6 px-2">
+          <h1 className="text-3xl font-bold">
+            {tabs.find((t) => t.id === activeTabId)?.name || "Schedule"}
+          </h1>
+          <p className="text-muted-foreground text-lg mt-1">
+            {selectedCourses.length} Courses
+          </p>
+        </div>
+        <div className="flex-1 border overflow-hidden shadow-sm">
+          <DesktopSchedule />
+        </div>
+      </div>
 
-			{/* Dialogs */}
-			<Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Rename Schedule</DialogTitle>
-						<DialogDescription>
-							Give your schedule a new name.
-						</DialogDescription>
-					</DialogHeader>
-					<div className="grid w-full gap-1.5 py-2">
-						<Label htmlFor="sched-name">Name</Label>
-						<Input
-							id="sched-name"
-							value={newName}
-							onChange={(e) => setNewName(e.target.value)}
-							onKeyDown={(e) => e.key === "Enter" && confirmRename()}
-							autoFocus
-						/>
-					</div>
-					<DialogFooter>
-						<Button
-							variant="outline"
-							onClick={() => setRenameDialogOpen(false)}
-						>
-							Cancel
-						</Button>
-						<Button onClick={confirmRename}>Save Changes</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-			<Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Delete Schedule</DialogTitle>
-						<DialogDescription>
-							Are you sure you want to delete{" "}
-							<span className="font-medium text-foreground">
-								"{tabToEdit?.name}"
-							</span>
-							?
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button
-							variant="outline"
-							onClick={() => setDeleteDialogOpen(false)}
-						>
-							Cancel
-						</Button>
-						<Button variant="destructive" onClick={confirmDelete}>
-							Delete
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+      {/* Dialogs */}
+      <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename Schedule</DialogTitle>
+            <DialogDescription>
+              Give your schedule a new name.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid w-full gap-1.5 py-2">
+            <Label htmlFor="sched-name">Name</Label>
+            <Input
+              id="sched-name"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && confirmRename()}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRenameDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={confirmRename}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Schedule</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-foreground">
+                "{tabToEdit?.name}"
+              </span>
+              ?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-			<div className="hidden md:block">
-				<KauFooter />
-			</div>
-		</div>
-	);
+      <div className="hidden md:block">
+        <KauFooter />
+      </div>
+    </div>
+  );
 }
