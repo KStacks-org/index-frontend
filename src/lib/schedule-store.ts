@@ -3,8 +3,6 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { searchCourses } from "@/lib/api";
 import { Course } from "@/types";
 
-let syncInFlight = false;
-
 // New Interface for a Tab
 export interface ScheduleTab {
   id: string;

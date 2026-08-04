@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toPng } from "html-to-image";
@@ -23,7 +23,10 @@ import {
   Download,
   X,
   Edit,
+  GraduationCap,
+  Clock,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sheet,
   SheetContent,
@@ -49,7 +52,6 @@ export const Route = createFileRoute("/planner")({
 });
 
 function SchedulePage() {
-  // --- Store Hooks ---
   const {
     tabs,
     activeTabId,
@@ -63,13 +65,12 @@ function SchedulePage() {
   const selectedCourses = getActiveCourses();
   const calendarRef = useRef<HTMLDivElement>(null);
   const downloadRef = useRef<HTMLDivElement>(null);
+  const syncRan = useRef(false);
 
-  // --- UI State ---
   const [sidebarMode, setSidebarMode] = useState<"view" | "search">("view");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // --- Dialog State ---
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [tabToEdit, setTabToEdit] = useState<{
@@ -83,7 +84,7 @@ function SchedulePage() {
     theme === "dark" ||
     (theme === "system" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches);
-  // --- Search State ---
+
   const [localFilters, setLocalFilters] = useState<Partial<SearchParams>>({
     termCode: "202701",
     page: 1,
@@ -97,7 +98,30 @@ function SchedulePage() {
     placeholderData: (prev) => prev,
   });
 
-  // --- Handlers ---
+  useEffect(() => {
+    if (!syncRan.current) {
+      syncRan.current = true;
+      useScheduleStore.getState().syncActiveTabCourses();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (syncRan.current) {
+      useScheduleStore.getState().syncActiveTabCourses();
+    }
+  }, [activeTabId]);
+
+  const stats = useMemo(() => {
+    const totalCredits = selectedCourses.reduce(
+      (sum, c) => sum + (c.credits || 0),
+      0,
+    );
+    const scheduledHours = selectedCourses.reduce((sum, c) => {
+      return sum + c.schedules.length;
+    }, 0);
+    return { totalCredits, scheduledHours, courseCount: selectedCourses.length };
+  }, [selectedCourses]);
+
   const handleLocalSearch = (newFilters: any) => {
     setLocalFilters((prev) => ({ ...prev, ...newFilters, page: 1 }));
   };
@@ -106,14 +130,12 @@ function SchedulePage() {
     setLocalFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  // Dialog: Open Rename
   const openRenameDialog = (id: string, currentName: string) => {
     setTabToEdit({ id, name: currentName });
     setNewName(currentName);
     setRenameDialogOpen(true);
   };
 
-  // Dialog: Confirm Rename
   const confirmRename = () => {
     if (tabToEdit && newName.trim()) {
       renameTab(tabToEdit.id, newName.trim());
@@ -122,13 +144,11 @@ function SchedulePage() {
     }
   };
 
-  // Dialog: Open Delete
   const openDeleteDialog = (id: string, name: string) => {
     setTabToEdit({ id, name });
     setDeleteDialogOpen(true);
   };
 
-  // Dialog: Confirm Delete
   const confirmDelete = () => {
     if (tabToEdit) {
       removeTab(tabToEdit.id);
@@ -136,11 +156,6 @@ function SchedulePage() {
       setTabToEdit(null);
     }
   };
-
-  // Duct Tape FIX
-  useEffect(() => {
-    useScheduleStore.getState().syncActiveTabCourses();
-  }, [activeTabId]);
 
   const checkConflict = (courseToCheck: Course): Course[] => {
     if (selectedCourses.some((c) => c.id === courseToCheck.id)) return [];
@@ -180,7 +195,6 @@ function SchedulePage() {
     try {
       setIsDownloading(true);
       const element = downloadRef.current;
-      // Let html-to-image capture the element as-is (at full desktop width)
       const dataUrl = await toPng(element, {
         cacheBust: true,
         backgroundColor: isDark ? "#0a0a0a" : "#ffffff",
@@ -200,33 +214,46 @@ function SchedulePage() {
     }
   };
 
+  const activeTab = tabs.find((t) => t.id === activeTabId);
+
   return (
     <div className="h-screen flex flex-col bg-background font-sans overflow-hidden">
       <KauHeader />
 
-      {/* Main App Content: z-index 10 keeps it ABOVE the hidden download view */}
       <div className="flex flex-1 md:flex overflow-hidden relative z-10 bg-background">
         <main className="flex-1 p-2 md:p-4 overflow-hidden w-full flex flex-col">
           <div className="max-w-7xl w-full mx-auto h-full flex flex-col">
-            {/* --- TOP BAR (Actions & Tabs) --- */}
-            <div className="flex flex-col gap-3 shrink-0">
+            {/* --- TOP BAR --- */}
+            <div className="flex flex-col gap-2 shrink-0">
               <div className="flex justify-between items-center px-1">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-xl md:text-2xl font-bold">Planner</h1>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={handleDownload}
-                    disabled={isDownloading || selectedCourses.length === 0}
-                    title="Download Image"
-                  >
-                    {isDownloading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Download className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <h1 className="text-xl md:text-2xl font-bold tracking-tight">
+                    Planner
+                  </h1>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={handleDownload}
+                        disabled={
+                          isDownloading || selectedCourses.length === 0
+                        }
+                      >
+                        {isDownloading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {selectedCourses.length === 0
+                        ? "Add courses first"
+                        : "Download as PNG"}
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
 
                 <div className="flex gap-2">
@@ -242,7 +269,7 @@ function SchedulePage() {
                       variant="secondary"
                       className="ml-1 h-5 px-1.5 min-w-5 justify-center"
                     >
-                      {selectedCourses.length}
+                      {stats.courseCount}
                     </Badge>
                   </Button>
 
@@ -258,15 +285,49 @@ function SchedulePage() {
                 </div>
               </div>
 
-              {/* Row 2: Tabs */}
-              <div className="flex items-center gap-1 px-1 overflow-x-auto no-scrollbar relative z-20">
-                {" "}
+              {/* Stats bar */}
+              {stats.courseCount > 0 && (
+                <div className="flex items-center gap-3 md:gap-4 px-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <GraduationCap className="h-3.5 w-3.5" />
+                    <span>
+                      <span className="font-semibold text-foreground">
+                        {stats.totalCredits}
+                      </span>{" "}
+                      credits
+                    </span>
+                  </div>
+                  <div className="w-px h-3 bg-border" />
+                  <div className="flex items-center gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5" />
+                    <span>
+                      <span className="font-semibold text-foreground">
+                        {stats.courseCount}
+                      </span>{" "}
+                      courses
+                    </span>
+                  </div>
+                  <div className="w-px h-3 bg-border" />
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span>
+                      <span className="font-semibold text-foreground">
+                        {stats.scheduledHours}
+                      </span>{" "}
+                      sessions
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Tabs */}
+              <div className="flex items-center gap-1 px-1 overflow-x-auto no-scrollbar relative">
                 {tabs.map((tab) => (
                   <div
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "group flex items-center gap-2 px-3 md:px-4 py-2 border-t border-x cursor-pointer text-xs md:text-sm font-medium transition-all select-none relative top-px whitespace-nowrap",
+                      "group flex items-center gap-2 px-3 md:px-4 py-2 border-t border-x cursor-pointer text-xs md:text-sm font-medium transition-colors select-none relative top-px whitespace-nowrap",
                       activeTabId === tab.id
                         ? "bg-background border-border text-foreground z-10"
                         : "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -277,7 +338,7 @@ function SchedulePage() {
                     </span>
                     <span
                       className={cn(
-                        "flex items-center justify-center text-[9px] h-4 min-w-4 px-1",
+                        "flex items-center justify-center text-[9px] h-4 min-w-4 px-1 rounded-full",
                         activeTabId === tab.id
                           ? "bg-primary/10 text-primary"
                           : "bg-black/5 dark:bg-white/10",
@@ -292,38 +353,54 @@ function SchedulePage() {
                             e.stopPropagation();
                             openRenameDialog(tab.id, tab.name);
                           }}
-                          className="hover:text-primary transition-colors p-1 hover:bg-muted"
+                          className="hover:text-primary transition-colors p-1 hover:bg-muted rounded"
                         >
                           <Edit className="h-3 w-3" />
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openDeleteDialog(tab.id, tab.name);
-                          }}
-                          disabled={tabs.length <= 1}
-                          className="hover:text-destructive transition-colors disabled:opacity-30 p-1 hover:bg-destructive/10"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteDialog(tab.id, tab.name);
+                              }}
+                              disabled={tabs.length <= 1}
+                              className="hover:text-destructive transition-colors disabled:opacity-30 p-1 hover:bg-destructive/10 rounded"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </TooltipTrigger>
+                          {tabs.length <= 1 && (
+                            <TooltipContent>Cannot delete last tab</TooltipContent>
+                          )}
+                        </Tooltip>
                       </div>
                     )}
                   </div>
                 ))}
-                <button
-                  onClick={() => addTab(`Schedule ${tabs.length + 1}`)}
-                  disabled={tabs.length >= 5}
-                  className="ml-1 p-1.5 hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() =>
+                        addTab(`Schedule ${tabs.length + 1}`)
+                      }
+                      disabled={tabs.length >= 5}
+                      className="ml-1 p-1.5 hover:bg-muted text-muted-foreground hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed rounded"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  {tabs.length >= 5 && (
+                    <TooltipContent>Maximum 5 schedules</TooltipContent>
+                  )}
+                </Tooltip>
               </div>
             </div>
 
-            {/* --- RESPONSIVE CALENDAR AREA --- */}
-            <div className="flex-1 bg-background border shadow-sm overflow-hidden flex flex-col min-h-0 z-0 relative">
+            {/* --- CALENDAR AREA --- */}
+            <div className="flex-1 bg-background border shadow-sm overflow-hidden flex flex-col min-h-0 mt-1">
               <div className="flex-1 overflow-auto bg-muted/5">
-                <div className="min-w-fit h-full p-2 md:p-0" ref={calendarRef}>
+                <div className="min-w-fit h-full p-1 md:p-0" ref={calendarRef}>
                   <ScheduleCalendar />
                 </div>
               </div>
@@ -347,6 +424,11 @@ function SchedulePage() {
                   <>
                     <BookOpen className="h-5 w-5 text-muted-foreground" /> My
                     Courses
+                    {stats.courseCount > 0 && (
+                      <Badge variant="secondary" className="ml-1">
+                        {stats.courseCount}
+                      </Badge>
+                    )}
                   </>
                 )}
               </SheetTitle>
@@ -430,13 +512,25 @@ function SchedulePage() {
                       </Button>
                     </div>
                   ) : (
-                    selectedCourses.map((course) => (
-                      <PlannerCourseCard
-                        noOutline
-                        key={course.id}
-                        course={course}
-                      />
-                    ))
+                    <>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-1">
+                        <span className="flex items-center gap-1">
+                          <GraduationCap className="h-3.5 w-3.5" />
+                          {stats.totalCredits} credits
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5" />
+                          {stats.scheduledHours} sessions
+                        </span>
+                      </div>
+                      {selectedCourses.map((course) => (
+                        <PlannerCourseCard
+                          noOutline
+                          key={course.id}
+                          course={course}
+                        />
+                      ))}
+                    </>
                   )}
                 </div>
               )}
@@ -452,7 +546,7 @@ function SchedulePage() {
           position: "fixed",
           left: 0,
           top: 0,
-          width: "1500px", // Force desktop width
+          width: "1500px",
           height: "1200px",
           zIndex: -50,
           visibility: "visible",
@@ -461,10 +555,10 @@ function SchedulePage() {
       >
         <div className="mb-6 px-2">
           <h1 className="text-3xl font-bold">
-            {tabs.find((t) => t.id === activeTabId)?.name || "Schedule"}
+            {activeTab?.name || "Schedule"}
           </h1>
           <p className="text-muted-foreground text-lg mt-1">
-            {selectedCourses.length} Courses
+            {stats.courseCount} Courses &middot; {stats.totalCredits} Credits
           </p>
         </div>
         <div className="flex-1 border overflow-hidden shadow-sm">
@@ -509,7 +603,7 @@ function SchedulePage() {
             <DialogDescription>
               Are you sure you want to delete{" "}
               <span className="font-medium text-foreground">
-                "{tabToEdit?.name}"
+                &ldquo;{tabToEdit?.name}&rdquo;
               </span>
               ?
             </DialogDescription>
