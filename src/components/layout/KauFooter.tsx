@@ -1,8 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 
 export function KauFooter() {
-	const currentYear = new Date().getFullYear();
-
 	return (
 		<footer className="bg-background mt-auto w-full">
 			<Separator />
@@ -23,7 +21,6 @@ export function KauFooter() {
 						/>
 						Index
 					</div>
-					<span>&copy; {currentYear} All rights reserved.</span>
 				</div>
 
 				{/* The Quote */}
