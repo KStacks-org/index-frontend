@@ -53,16 +53,21 @@ export function KauHeader() {
     <header className="bg-background border-b border-border py-4 px-6 flex justify-between items-center sticky top-0 z-50">
       {/* --- LEFT SIDE: Logo --- */}
       <div
-        className="flex items-center gap-3 cursor-pointer select-none group"
+        className="flex items-center gap-2 cursor-pointer select-none group"
         onClick={() => navigate({ to: "/" })}
       >
-        {/*<img
-					src="/favicon.svg"
-					alt="KAU Logo"
-					className="h-10 w-10 object-contain transition-transform group-hover:scale-105"
-				/>*/}
+        <img
+          src="/index-logo-light.svg"
+          alt="Index logo"
+          className="h-8 w-8 object-contain transition-transform group-hover:scale-105 dark:hidden"
+        />
+        <img
+          src="/index-logo-dark.svg"
+          alt="Index logo"
+          className="h-8 w-8 object-contain transition-transform group-hover:scale-105 hidden dark:block"
+        />
         <div className="font-bold text-2xl tracking-tight text-foreground">
-          KAU<span className="text-green-600 dark:text-green-400">Index</span>
+          Index
         </div>
       </div>
 
@@ -97,7 +102,16 @@ export function KauHeader() {
             <SheetContent side="right">
               <SheetHeader className="text-left border-b pb-4 mb-4">
                 <SheetTitle className="flex items-center gap-2">
-                  {/*<img src="/favicon.svg" alt="Logo" className="h-6 w-6" />*/}
+                  <img
+                    src="/index-logo-light.svg"
+                    alt="Index logo"
+                    className="h-6 w-6 dark:hidden"
+                  />
+                  <img
+                    src="/index-logo-dark.svg"
+                    alt="Index logo"
+                    className="h-6 w-6 hidden dark:block"
+                  />
                   <span>Menu</span>
                 </SheetTitle>
               </SheetHeader>
