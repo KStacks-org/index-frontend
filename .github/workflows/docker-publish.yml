@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: kstacks-org/kauindex-frontend
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -90,8 +90,8 @@ jobs:
       - name: Update kauindex-frontend image tag
         run: |
           SHORT_SHA="${GITHUB_SHA::7}"
-          NEW_IMAGE="ghcr.io/kstacks-org/kauindex-frontend:main-${SHORT_SHA}"
-          FILE="infra/kauindex-frontend/deployment.yaml"
+          NEW_IMAGE="ghcr.io/kstacks-org/index-frontend:main-${SHORT_SHA}"
+          FILE="infra/apps/index-frontend/deployment.yaml"
 
           yq -i ".spec.template.spec.containers[0].image = \"${NEW_IMAGE}\"" "$FILE"
 
@@ -104,7 +104,7 @@ jobs:
           cd infra
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add kauindex-frontend/deployment.yaml
+          git add apps/index-frontend/deployment.yaml
           git diff --cached --quiet && echo "No changes to commit" && exit 0
-          git commit -m "chore(kauindex-frontend): bump image to main-${SHORT_SHA}"
+          git commit -m "chore(index-frontend): bump image to main-${SHORT_SHA}"
           git push
