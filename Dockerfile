@@ -1,27 +1,28 @@
-# 1. Use an official Node.js runtime as a parent image
-FROM node:22-alpine
+# Stage 1: Build
+FROM node:24-alpine AS builder
 
-# 2. Set the working directory inside the container
+RUN corepack enable && corepack prepare pnpm@10.33.4 --activate
+
 WORKDIR /app
 
-# 3. Enable pnpm (Corepack is included in Node.js >=16.10)
-RUN corepack enable
-
-# 4. Copy package.json and pnpm-lock.yaml first
-# This allows Docker to cache dependencies if these files haven't changed
-COPY package.json pnpm-lock.yaml ./
-
-# 5. Install dependencies
-# --frozen-lockfile ensures strict adherence to the lockfile (like npm ci)
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
-# 6. Copy the rest of your application code
 COPY . .
-
+ARG VITE_BASE_URL
+ENV VITE_BASE_URL=${VITE_BASE_URL}
 RUN pnpm run build
 
-# 7. Expose the port your app runs on
+# Stage 2: Production
+FROM node:24-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+COPY --from=builder /app/.output ./.output
+
 EXPOSE 3000
 
-# 8. Define the command to run your app
-CMD ["npx", "vite", "preview", "--port", "3000", "--host"]
+CMD ["node", ".output/server/index.mjs"]
