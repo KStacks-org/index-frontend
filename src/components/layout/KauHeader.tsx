@@ -75,15 +75,12 @@ export function KauHeader() {
       <nav className="flex items-center gap-3">
         {/* DESKTOP LINKS (Hidden on mobile) */}
         <div className="hidden md:flex items-center gap-6 mr-2">
-          <Link
-            to="/planner"
+          <a
+            href="https://planner.kstacks.org"
             className="flex items-center font-medium text-sm text-muted-foreground hover:text-green-600 dark:hover:text-green-400 transition-colors"
-            activeProps={{
-              className: "text-green-600 dark:text-green-400 font-semibold",
-            }}
           >
             <span>Schedule Planner</span>
-          </Link>
+          </a>
         </div>
 
         {/* Theme Toggle (Visible on all screens) */}
@@ -129,17 +126,14 @@ export function KauHeader() {
                   Search Courses
                 </Link>
 
-                <Link
-                  to="/planner"
+                <a
+                  href="https://planner.kstacks.org"
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted transition-colors"
-                  activeProps={{
-                    className: "bg-muted text-green-600 dark:text-green-400",
-                  }}
                 >
                   <Calendar className="h-5 w-5" />
                   Schedule Planner
-                </Link>
+                </a>
               </div>
             </SheetContent>
           </Sheet>
