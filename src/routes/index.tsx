@@ -20,7 +20,7 @@ function KauIndexHome() {
 							Find Your <span className="text-green-400">Courses</span>
 						</h1>
 						<p className="text-muted-foreground mb-10 max-w-lg mx-auto text-lg">
-							Search and discover courses at King Abdulaziz University with
+							Search and discover courses with
 							ease.
 						</p>
 					</div>

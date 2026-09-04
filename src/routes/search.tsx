@@ -58,8 +58,8 @@ export const Route = createFileRoute("/search")({
       meta: [
         {
           title: query
-            ? `${query} Courses - KAU Schedule`
-            : `Search KAU Courses - Browse ${total} Classes`,
+            ? `${query} Courses - Schedule`
+            : `Search Courses - Browse ${total} Classes`,
         },
         {
           name: "description",
