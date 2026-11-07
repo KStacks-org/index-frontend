@@ -23,7 +23,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   </url>
 
   <url>
-    <loc>${baseUrl}/search?termCode=202602</loc>
+    <loc>${baseUrl}/search?termCode=202702</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 		.map(
 			(term) => `
   <url>
-    <loc>${baseUrl}/search?termCode=202602&q=${encodeURIComponent(term)}</loc>
+    <loc>${baseUrl}/search?termCode=202702&q=${encodeURIComponent(term)}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`,

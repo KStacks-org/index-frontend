@@ -31,7 +31,7 @@ export const Route = createFileRoute("/search")({
       startTime: (search.startTime as string) || "",
       endTime: (search.endTime as string) || "",
       section: (search.section as string) || "",
-      termCode: (search.termCode as string) || "202602",
+      termCode: (search.termCode as string) || "202702",
       page: Number(search.page) || 1,
     };
   },
