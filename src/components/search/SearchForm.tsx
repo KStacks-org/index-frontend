@@ -60,7 +60,7 @@ export function SearchForm({
   }, [filtersOpen, layout, overlayFilters]);
 
   // --- STATE ---
-  const [termCode, setTermCode] = useState(initialValues?.termCode || "202701");
+  const [termCode, setTermCode] = useState(initialValues?.termCode || "202702");
   const [query, setQuery] = useState(initialValues?.q || "");
   const [dayFilter, setDayFilter] = useState(initialValues?.days || "");
   const [levelFilter, setLevelFilter] = useState(initialValues?.level || "");
@@ -153,6 +153,7 @@ export function SearchForm({
           <SelectContent>
             <SelectItem value="202602">2026 Term 2</SelectItem>
             <SelectItem value="202701">2027 Term 1</SelectItem>
+            <SelectItem value="202702">2027 Term 2</SelectItem>
           </SelectContent>
         </Select>
       </div>
