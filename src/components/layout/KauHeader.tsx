@@ -18,6 +18,8 @@ import { Button } from "../ui/button";
 import { Moon, Sun, Menu, GraduationCap, Calendar } from "lucide-react";
 import { RamadanToggle } from "./RamadanToggle";
 
+const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN || "kstacks.org";
+
 function ModeToggle() {
   const { setTheme } = useTheme();
 
@@ -76,7 +78,7 @@ export function KauHeader() {
         {/* DESKTOP LINKS (Hidden on mobile) */}
         <div className="hidden md:flex items-center gap-6 mr-2">
           <a
-            href="https://planner.kstacks.org"
+            href={`https://planner.${APP_DOMAIN}`}
             className="flex items-center font-medium text-sm text-muted-foreground hover:text-green-600 dark:hover:text-green-400 transition-colors"
           >
             <span>Schedule Planner</span>
@@ -127,7 +129,7 @@ export function KauHeader() {
                 </Link>
 
                 <a
-                  href="https://planner.kstacks.org"
+                  href={`https://planner.${APP_DOMAIN}`}
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-muted transition-colors"
                 >
