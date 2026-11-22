@@ -9,9 +9,8 @@ COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
-ARG VITE_BASE_URL
-ENV VITE_BASE_URL=${VITE_BASE_URL}
-RUN pnpm run build
+ARG BUILD_MODE=prod
+RUN pnpm run build --mode "$BUILD_MODE"
 
 # Stage 2: Production
 FROM node:24-alpine AS runner
